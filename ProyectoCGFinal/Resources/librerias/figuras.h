@@ -25,4 +25,14 @@ class CFiguras
 	//void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos, GLuint text );
 	void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos);
 
+	void piso(GLuint text);
+	void mesa();
+	void silla();
+	void cuarto();
 };
+/*
+	00,01,11,10		0471	00,10,11,01
+	00,10,11,01		0354	00,10,11,01
+	01,11,10,00		6532	00,10,11,01
+	10,11,01,00		1762	00,10,11,01
+*/
