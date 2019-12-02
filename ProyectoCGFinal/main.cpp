@@ -84,6 +84,9 @@ float aux = 0.0;
 
 // BANDERAS
 bool banderaCG = false;	//para mostrar las PC, son pesadas.
+bool banderaCJ = false;	//Visualización de Camara enfocada en el Juego
+bool banderaCC = false;	//Visualización de Camara enfocada en el cuarto
+bool banderaCO = false;	//Visualización de Camara original
 // END BANDERAS
 
 //ANIMACION
@@ -165,6 +168,28 @@ void InitGL(GLvoid)     // Inicializamos parametros
 //	glookupdown 0.0
 	objCamera.Position_Camera(0.13f, 3.2f, 8.95f, 0.13f, 3.2f, 5.95f, 0, 1, 0);
 
+	//Posiciones de cámaras para Juego y Cuarto iniciales
+	pos_xC = 7.18 ;
+	pos_yC = 42.8;
+	pos_zC = -5.63;
+	view_xC = 7.18;
+	view_yC = 44.5;
+	view_zC = -8.63;
+	up_xC = 0.0;
+	up_yC = 1.0;
+	up_zC = 0.0;
+	lookUpDownC = 119.0;
+
+	pos_xJ = 2.95;
+	pos_yJ = 3.9;
+	pos_zJ = 44.59;
+	view_xJ = 2.95;
+	view_yJ = 3.9;
+	view_zJ = 41.59;
+	up_xJ = 0.0;
+	up_yJ = 1.0;
+	up_zJ = 0.0;
+	lookUpDownJ = 0.0;
 }
 
 void pintaTexto(float x, float y, float z, void* font, char* string)
@@ -567,63 +592,136 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 
 		break;
 	case '0':	//Original
-		objCamera.Position_Camera(10, 2.5f, 13, 10, 2.5f, 10, 0, 1, 0);
+		banderaCO = true;	//Estamos en camara original
+		//Posiciona la camara a la posición original. Si viene de cualquier otra cámara, no debe borrar los anteriores estados.
+		if (banderaCC == true) {
+			//Viene de Camara Juego
+			banderaCC = false;//quitamos bandera CJ
+			//Guardo valores de la camara anterior (Cuarto)
+			pos_xC = objCamera.mPos.x;
+			pos_yC = objCamera.mPos.y;
+			pos_zC = objCamera.mPos.z;
+			view_xC = objCamera.mView.x;
+			view_yC = objCamera.mView.y;
+			view_zC = objCamera.mView.z;
+			up_xC = objCamera.mUp.x;
+			up_yC = objCamera.mUp.y;
+			up_zC = objCamera.mUp.z;
+			lookUpDownC = g_lookupdown;
+		}
+		if (banderaCJ == true) {
+			//Viene de Camara Juego
+			banderaCJ = false;//quitamos bandera CJ
+			//Guardo valores de la camara anterior (Juego)
+			pos_xJ = objCamera.mPos.x;
+			pos_yJ = objCamera.mPos.y;
+			pos_zJ = objCamera.mPos.z;
+			view_xJ = objCamera.mView.x;
+			view_yJ = objCamera.mView.y;
+			view_zJ = objCamera.mView.z;
+			up_xJ = objCamera.mUp.x;
+			up_yJ = objCamera.mUp.y;
+			up_zJ = objCamera.mUp.z;
+			lookUpDownJ = g_lookupdown;
+		}
 		g_lookupdown = 0.0;
+		objCamera.Position_Camera(0.13f, 3.2f, 8.95f, 0.13f, 3.2f, 5.95f, 0, 1, 0);
 		break;
-	case '1':	//Top
-	/*
-	void CCamera::Position_Camera(float pos_x,  float pos_y,  float pos_z,
-						  float view_x, float view_y, float view_z,
-						  float up_x,   float up_y,   float up_z)
-	*/
-		//Guarda prev position
-		pos_xC = objCamera.mPos.x;
-		pos_yC = objCamera.mPos.y;
-		pos_zC = objCamera.mPos.z;
-		view_xC = objCamera.mView.x;
-		view_yC = objCamera.mView.y;
-		view_zC = objCamera.mView.z;
-		up_xC = objCamera.mUp.x;
-		up_yC = objCamera.mUp.y;
-		up_zC = objCamera.mUp.z;
-		lookUpDownC = g_lookupdown;
+	case '1':	//Cuarto
+		banderaCC = true;	//Estamos en camara cuarto.
+		if (banderaCO == true) {
+			//Si viene de cámara original, no debe cambiar nada de los estados anteriores de la cámara para Cuarto y Juego
+			pos_xC = pos_xC;
+			pos_yC = pos_yC;
+			pos_zC = pos_zC;
+			view_xC = view_xC;
+			view_yC = view_yC;
+			view_zC = view_zC;
+			up_xC = up_xC;
+			up_yC = up_yC;
+			up_zC = up_zC;
+			lookUpDownC = lookUpDownC;
 
-		g_lookupdown = 119.0;
-		objCamera.Position_Camera(7.18, 42.8, -5.63, 7.18, 44.5, -8.63, objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
+			banderaCO = false;
+			g_lookupdown = lookUpDownC;
+			objCamera.Position_Camera(pos_xC, pos_yC, pos_zC, view_xC, view_yC, view_zC, up_xC, up_yC, up_zC);
+		}
+		else {
+			//Reviso el estado de las otras cámaras. De por si, banderaCO ya se sabe es false.
+			//Primero, reviso si CJ estaba previamente true, de modo que se sabe que viene de esa cámara.
+			if (banderaCJ == true) {
+				//Viene de Camara Juego
+				banderaCJ = false;//quitamos bandera CJ
+				//Guardo valores de la camara anterior (Juego)
+				pos_xJ = objCamera.mPos.x;
+				pos_yJ = objCamera.mPos.y;
+				pos_zJ = objCamera.mPos.z;
+				view_xJ = objCamera.mView.x;
+				view_yJ = objCamera.mView.y;
+				view_zJ = objCamera.mView.z;
+				up_xJ = objCamera.mUp.x;
+				up_yJ = objCamera.mUp.y;
+				up_zJ = objCamera.mUp.z;
+				lookUpDownJ = g_lookupdown;
+			}
+			//Si es false, quiere decir que es o la primera vez que entra o viene de CO sin haberse metido a CJ
+			g_lookupdown = lookUpDownC;
+			objCamera.Position_Camera(pos_xC, pos_yC, pos_zC, view_xC, view_yC, view_zC, up_xC, up_yC, up_zC);
+		}
+		
 		break;
-	case '2':	//Front
-		g_lookupdown = 0.0;
-		objCamera.Position_Camera(2.95, 3.9, 44.59, 2.95, 3.9, 41.59, objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
+	case '2':	//Juego
+		banderaCJ = true;
+		if (banderaCO == true) {
+			//Si viene de cámara original, no debe cambiar nada de los estados anteriores de la cámara para Cuarto y Juego
+			pos_xJ = pos_xJ;
+			pos_yJ = pos_yJ;
+			pos_zJ = pos_zJ;
+			view_xJ = view_xJ;
+			view_yJ = view_yJ;
+			view_zJ = view_zJ;
+			up_xJ = up_xJ;
+			up_yJ = up_yJ;
+			up_zJ = up_zJ;
+			lookUpDownJ = lookUpDownJ;
+			banderaCO = false;
+			g_lookupdown = lookUpDownJ;
+			objCamera.Position_Camera(pos_xJ, pos_yJ, pos_zJ, view_xJ, view_yJ, view_zJ, up_xJ, up_yJ, up_zJ);
+		}
+		else {
+			//Reviso el estado de las otras cámaras. De por si, banderaCO ya se sabe es false.
+			//Primero, reviso si CC estaba previamente true, de modo que se sabe que viene de esa cámara.
+			if (banderaCC == true) {
+				//Viene de Camara Juego
+				banderaCC = false;//quitamos bandera CJ
+				//Guardo valores de la camara anterior (Cuarto)
+				pos_xC = objCamera.mPos.x;
+				pos_yC = objCamera.mPos.y;
+				pos_zC = objCamera.mPos.z;
+				view_xC = objCamera.mView.x;
+				view_yC = objCamera.mView.y;
+				view_zC = objCamera.mView.z;
+				up_xC = objCamera.mUp.x;
+				up_yC = objCamera.mUp.y;
+				up_zC = objCamera.mUp.z;
+				lookUpDownC = g_lookupdown;
+			}
+			//Si es false, quiere decir que es o la primera vez que entra o viene de CO sin haberse metido a CC
+			g_lookupdown = lookUpDownJ;
+			objCamera.Position_Camera(pos_xJ, pos_yJ, pos_zJ, view_xJ, view_yJ, view_zJ, up_xJ, up_yJ, up_zJ);
+		}
 		break;
-	case '3':	//Right
-		g_lookupdown = 0.0;
-		objCamera.Position_Camera(45.73, 4.6, -3.63, 42.73, 4.6, -3.72, objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
+	case '3':	//
+		
 		break;
-	case '4':	//Left
-		g_lookupdown = 0.0;
-		objCamera.Position_Camera(-36.92, 4.6, -4.69, -33.92, 4.6, -4.63, objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
+	case '4':	//
+		
 		break;
 	case '5':
-		//Laboratorio
-		g_lookupdown = 14.0;
-		objCamera.Position_Camera(-11.88, 3.9, -1.698, -9.65, 3.9, -3.701, objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
-
-		banderaCG = !banderaCG;
-		//Lz += 1.0;
+		
 		break;
 	case '7':
-		pos_xJ = objCamera.mPos.x;
-		pos_yJ = objCamera.mPos.y;
-		pos_zJ = objCamera.mPos.z;
-		view_xJ = objCamera.mView.x;
-		view_yJ = objCamera.mView.y;
-		view_zJ = objCamera.mView.z;
-		up_xJ = objCamera.mUp.x;
-		up_yJ = objCamera.mUp.y;
-		up_zJ = objCamera.mUp.z;
-		lookUpDownJ = g_lookupdown;
-		g_lookupdown = lookUpDownC;
-		objCamera.Position_Camera(pos_xC,pos_yC,pos_zC,view_xC,view_yC,view_zC,up_xC,up_yC,up_zC);
+		
 		break;
 	case 27:        // Cuando Esc es presionado...
 		exit(0);   // Salimos del programa
