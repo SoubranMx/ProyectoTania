@@ -31,6 +31,7 @@ class CFiguras
 	void silla(GLuint text, float f, float lx, float ly);
 	void cuarto(GLuint pared1, GLuint pared2, GLuint piso, float normal);
 	void puerta(GLuint text);
+	void ventana(GLuint text, float textX, float textY);
 };
 /*
 	00,01,11,10		0471	00,10,11,01

@@ -57,6 +57,7 @@ CTexture t_wall;
 CTexture t_door;
 CTexture t_mesa;
 CTexture t_silla;
+CTexture t_ventana;
 //END TEXTURAS
 
 // MODELOS
@@ -105,19 +106,22 @@ CModel nRey;
 CModel nReina;
 //END MODELOS
 
-//Auxiliares para dejar en su lugar cualquier cosa cuando la mueves con 568 o kli
+//Auxiliares para dejar en su lugar cualquier cosa cuando la mueves con kli
 float  Lx = 0.0;
 float  Ly = 0.0;
 float  Lz = 0.0;
-float aux = 0.0;
+//float aux = 0.0;
 //glTranslatef(3.8, 4.5, 9.0);
+//Mover posiciones
 float trax = 0.0;
 float tray = 0.0;
 float traz = 0.0;
+//Mover texturas
 float textX = 0.0;
 float textY = 0.0;
 float rotSillon = 0.0;
 
+//Mover escalas
 float scaleX = 0.0;
 float scaleY = 0.0;
 float scaleZ = 0.0;
@@ -127,11 +131,13 @@ bool banderaCJ = false;	//Visualización de Camara enfocada en el Juego
 bool banderaCC = false;	//Visualización de Camara enfocada en el cuarto
 bool banderaCO = false;	//Visualización de Camara original
 bool banderaPuerta = false;
+bool banderaVentana = false;
 bool banderaUpDown = false;
 // END BANDERAS
 
 //ANIMACION
 float rotPuerta = 0.0f;
+float rotVentana = 0.0f;
 //END ANIMACION
 
 //CAMARA
@@ -208,18 +214,15 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	t_mesa.BuildGLTexture();
 	t_mesa.ReleaseImage();
 
+	t_ventana.LoadTGA("Resources/Texturas/ventana.tga");
+	t_ventana.BuildGLTexture();
+	t_ventana.ReleaseImage();
+
 //Carga de Figuras
 	sofa._3dsLoad("Resources/Modelos/sofa2.3DS");
 	//sofa.VertexNormals();
 	tv._3dsLoad("Resources/Modelos/TVs.3DS");
-	//tv.VertexNormals();
-	//muebleTV._3dsLoad("Resources/Modelos/TVMueble/HDTV_Entertainment_Center.3DS");
-	//muebleTV.VertexNormals();
-	//arcade._3dsLoad("Resources/Modelos/Arcade/arcade.3DS");
-	//arcade.VertexNormals();
 	librero._3dsLoad("Resources/Modelos/estante3.3DS");
-	//librero.VertexNormals();
-
 	chess._3dsLoad("Resources/Modelos/Chess/chessboard.3DS");
 	bPeon._3dsLoad("Resources/Modelos/Chess/pawnB.3DS");
 	nPeon._3dsLoad("Resources/Modelos/Chess/pawnN.3DS");
@@ -374,6 +377,17 @@ void createPuerta() {
 		glScalef(18.1, 18.1, 1.0);
 		glDisable(GL_LIGHTING);
 		puerta.puerta(t_door.GLindex);
+		glEnable(GL_LIGHTING);
+	glPopMatrix();
+}
+
+void createVentana() {
+	glPushMatrix();
+		glTranslatef(0.0+trax, 14.5+tray, -10.0+traz);
+		glRotatef(rotVentana, 1.0, 0.0, 0.0);	//rotVentana sirve para la animación de abrir y cerrar puerta con tecla 4
+		glScalef(18.0+scaleX, 18.0+scaleY, 1.0);
+		glDisable(GL_LIGHTING);
+		puerta.ventana(t_ventana.GLindex, 0.0, 0.0);
 		glEnable(GL_LIGHTING);
 	glPopMatrix();
 }
@@ -694,13 +708,14 @@ void display(void)   // Creamos la funcion donde se dibuja
 		
 		createCuarto();
 		createPuerta();
-		createMuebles();
-		createChess();
+		createVentana();
+		//createMuebles();
+		//createChess();
 		//Sin esto, se queda el color del material del estante? why???
 		glDisable(GL_LIGHTING);
 		glDisable(GL_COLOR_MATERIAL);
-		createMesa();
-		createSillas();
+		//createMesa();
+		//createSillas();
 
 		
 	glPopMatrix();	//General
@@ -756,6 +771,18 @@ void animacion()
 					banderaPuerta = false;
 			}
 		}
+		if (banderaVentana == true) {
+			if (banderaUpDown == true) {	//Va de 0 a 90
+				rotVentana += 2.0;
+				if (rotVentana == 66.0)
+					banderaVentana = false;
+			}
+			else {
+				rotVentana -= 2.0;
+				if (rotVentana == 0.0)
+					banderaVentana = false;
+			}
+		}
 		dwLastUpdateTime = dwCurrentTime;
 	}
 	if (dwElapsedTime >= 30)
@@ -791,137 +818,39 @@ void reshape(int width, int height)   // Creamos funcion Reshape
 void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 {
 	switch (key) {
-	case 'w':   //Movimientos de camara
-	case 'W':
-		objCamera.Move_Camera(CAMERASPEED + 0.2);
-		break;
+		case 'w':   //Movimientos de camara
+		case 'W':
+			objCamera.Move_Camera(CAMERASPEED + 0.2);
+			break;
 
-	case 's':
-	case 'S':
-		objCamera.Move_Camera(-(CAMERASPEED + 0.2));
-		break;
+		case 's':
+		case 'S':
+			objCamera.Move_Camera(-(CAMERASPEED + 0.2));
+			break;
 
-	case 'a':
-	case 'A':
-		objCamera.Strafe_Camera(-(CAMERASPEED + 0.4));
-		break;
+		case 'a':
+		case 'A':
+			objCamera.Strafe_Camera(-(CAMERASPEED + 0.4));
+			break;
 
-	case 'd':
-	case 'D':
-		objCamera.Strafe_Camera(CAMERASPEED + 0.4);
-		break;
+		case 'd':
+		case 'D':
+			objCamera.Strafe_Camera(CAMERASPEED + 0.4);
+			break;
 
-	case ' ':		//Poner algo en movimiento
-		//Commit?
-		printf("mPos.x = %f\tmPos.y = %f\tmPos.z = %f\n",objCamera.mPos.x, objCamera.mPos.y, objCamera.mPos.z);
-		printf("mView.x = %f\tmView.y = %f\tmView.z = %f\n", objCamera.mView.x, objCamera.mView.y, objCamera.mView.z);
-		printf("mUp.x = %f\tmUp.y = %f\tmUp.z = %f\n", objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
-		printf("glookupdown = %f\n", g_lookupdown);
-		printf("CAMERASPEED: %f\n", CAMERASPEED);
-		printf("******************************************\n");
+		case ' ':		//Poner algo en movimiento
+			//Commit?
+			printf("mPos.x = %f\tmPos.y = %f\tmPos.z = %f\n",objCamera.mPos.x, objCamera.mPos.y, objCamera.mPos.z);
+			printf("mView.x = %f\tmView.y = %f\tmView.z = %f\n", objCamera.mView.x, objCamera.mView.y, objCamera.mView.z);
+			printf("mUp.x = %f\tmUp.y = %f\tmUp.z = %f\n", objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
+			printf("glookupdown = %f\n", g_lookupdown);
+			printf("CAMERASPEED: %f\n", CAMERASPEED);
+			printf("******************************************\n");
 
-		break;
-	case '0':	//Original
-		banderaCO = true;	//Estamos en camara original
-		//Posiciona la camara a la posición original. Si viene de cualquier otra cámara, no debe borrar los anteriores estados.
-		if (banderaCC == true) {
-			//Viene de Camara Juego
-			banderaCC = false;//quitamos bandera CJ
-			//Guardo valores de la camara anterior (Cuarto)
-			pos_xC = objCamera.mPos.x;
-			pos_yC = objCamera.mPos.y;
-			pos_zC = objCamera.mPos.z;
-			view_xC = objCamera.mView.x;
-			view_yC = objCamera.mView.y;
-			view_zC = objCamera.mView.z;
-			up_xC = objCamera.mUp.x;
-			up_yC = objCamera.mUp.y;
-			up_zC = objCamera.mUp.z;
-			lookUpDownC = g_lookupdown;
-		}
-		if (banderaCJ == true) {
-			//Viene de Camara Juego
-			banderaCJ = false;//quitamos bandera CJ
-			//Guardo valores de la camara anterior (Juego)
-			pos_xJ = objCamera.mPos.x;
-			pos_yJ = objCamera.mPos.y;
-			pos_zJ = objCamera.mPos.z;
-			view_xJ = objCamera.mView.x;
-			view_yJ = objCamera.mView.y;
-			view_zJ = objCamera.mView.z;
-			up_xJ = objCamera.mUp.x;
-			up_yJ = objCamera.mUp.y;
-			up_zJ = objCamera.mUp.z;
-			lookUpDownJ = g_lookupdown;
-		}
-		g_lookupdown = 16.0;
-		//objCamera.Position_Camera(0.13f, 3.2f, 8.95f, 0.13f, 3.2f, 5.95f, 0, 1, 0);
-		objCamera.Position_Camera(4.36f, 15.8f, 30.82f, 4.15f, 15.8f, 27.82f, 0, 1, 0);
-		break;
-	case '1':	//Cuarto
-		banderaCC = true;	//Estamos en camara cuarto.
-		if (banderaCO == true) {
-			//Si viene de cámara original, no debe cambiar nada de los estados anteriores de la cámara para Cuarto y Juego
-			pos_xC = pos_xC;
-			pos_yC = pos_yC;
-			pos_zC = pos_zC;
-			view_xC = view_xC;
-			view_yC = view_yC;
-			view_zC = view_zC;
-			up_xC = up_xC;
-			up_yC = up_yC;
-			up_zC = up_zC;
-			lookUpDownC = lookUpDownC;
-
-			banderaCO = false;
-			g_lookupdown = lookUpDownC;
-			objCamera.Position_Camera(pos_xC, pos_yC, pos_zC, view_xC, view_yC, view_zC, up_xC, up_yC, up_zC);
-		}
-		else {
-			//Reviso el estado de las otras cámaras. De por si, banderaCO ya se sabe es false.
-			//Primero, reviso si CJ estaba previamente true, de modo que se sabe que viene de esa cámara.
-			if (banderaCJ == true) {
-				//Viene de Camara Juego
-				banderaCJ = false;//quitamos bandera CJ
-				//Guardo valores de la camara anterior (Juego)
-				pos_xJ = objCamera.mPos.x;
-				pos_yJ = objCamera.mPos.y;
-				pos_zJ = objCamera.mPos.z;
-				view_xJ = objCamera.mView.x;
-				view_yJ = objCamera.mView.y;
-				view_zJ = objCamera.mView.z;
-				up_xJ = objCamera.mUp.x;
-				up_yJ = objCamera.mUp.y;
-				up_zJ = objCamera.mUp.z;
-				lookUpDownJ = g_lookupdown;
-			}
-			//Si es false, quiere decir que es o la primera vez que entra o viene de CO sin haberse metido a CJ
-			g_lookupdown = lookUpDownC;
-			objCamera.Position_Camera(pos_xC, pos_yC, pos_zC, view_xC, view_yC, view_zC, up_xC, up_yC, up_zC);
-		}
-		
-		break;
-	case '2':	//Juego
-		banderaCJ = true;
-		if (banderaCO == true) {
-			//Si viene de cámara original, no debe cambiar nada de los estados anteriores de la cámara para Cuarto y Juego
-			pos_xJ = pos_xJ;
-			pos_yJ = pos_yJ;
-			pos_zJ = pos_zJ;
-			view_xJ = view_xJ;
-			view_yJ = view_yJ;
-			view_zJ = view_zJ;
-			up_xJ = up_xJ;
-			up_yJ = up_yJ;
-			up_zJ = up_zJ;
-			lookUpDownJ = lookUpDownJ;
-			banderaCO = false;
-			g_lookupdown = lookUpDownJ;
-			objCamera.Position_Camera(pos_xJ, pos_yJ, pos_zJ, view_xJ, view_yJ, view_zJ, up_xJ, up_yJ, up_zJ);
-		}
-		else {
-			//Reviso el estado de las otras cámaras. De por si, banderaCO ya se sabe es false.
-			//Primero, reviso si CC estaba previamente true, de modo que se sabe que viene de esa cámara.
+			break;
+		case '0':	//Original
+			banderaCO = true;	//Estamos en camara original
+			//Posiciona la camara a la posición original. Si viene de cualquier otra cámara, no debe borrar los anteriores estados.
 			if (banderaCC == true) {
 				//Viene de Camara Juego
 				banderaCC = false;//quitamos bandera CJ
@@ -937,85 +866,190 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 				up_zC = objCamera.mUp.z;
 				lookUpDownC = g_lookupdown;
 			}
-			//Si es false, quiere decir que es o la primera vez que entra o viene de CO sin haberse metido a CC
-			g_lookupdown = lookUpDownJ;
-			objCamera.Position_Camera(pos_xJ, pos_yJ, pos_zJ, view_xJ, view_yJ, view_zJ, up_xJ, up_yJ, up_zJ);
-		}
-		break;
-	case '3':	//
-		if (banderaPuerta == false) {
-			banderaPuerta = true;
-			if (rotPuerta == 0)
-				banderaUpDown = true;	//Va de 0 a 90
-			else
-				banderaUpDown = false;	//Va de 90 a 0;
-		}
-		break;
-	case '4':	//
-		break;
-	case '5':
-		break;
-	case '6':
-		rotSillon += 1.0;
-		printf("rot = %f\n", rotSillon);
-		break;
-	case '7':
-		rotSillon -= 1.0;
-		printf("rot = %f\n", rotSillon);
-		break;
-	case 'j':
-		trax += 0.1;
-		printf("x = %f\ty = %f\tz = %f\n", trax,tray,traz);
-		break;
-	case 'i':
-		tray += 0.1;
-		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
-		break;
-	case 'k':
-		traz += 0.1;
-		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
-		break;
-	case 'J':
-		trax -= 0.1;
-		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
-		break;
-	case 'I':
-		tray -= 0.1;
-		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
-		break;
-	case 'K':
-		traz -= 0.1;
-		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
-		break;
-	case 'b':
-		scaleX += 0.01;
-		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-		break;
-	case 'B':
-		scaleX -= 0.01;
-		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-		break;
-	case 'n':
-		scaleY += 0.01;
-		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-		break;
-	case 'N':
-		scaleY -= 0.01;
-		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-		break;
-	case 'm':
-		scaleZ += 0.01;
-		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-		break;
-	case 'M':
-		scaleZ -= 0.01;
-		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-		break;
-	case 27:        // Cuando Esc es presionado...
-		exit(0);   // Salimos del programa
-		break;
-	default:        // Cualquier otra
-		break;
+			if (banderaCJ == true) {
+				//Viene de Camara Juego
+				banderaCJ = false;//quitamos bandera CJ
+				//Guardo valores de la camara anterior (Juego)
+				pos_xJ = objCamera.mPos.x;
+				pos_yJ = objCamera.mPos.y;
+				pos_zJ = objCamera.mPos.z;
+				view_xJ = objCamera.mView.x;
+				view_yJ = objCamera.mView.y;
+				view_zJ = objCamera.mView.z;
+				up_xJ = objCamera.mUp.x;
+				up_yJ = objCamera.mUp.y;
+				up_zJ = objCamera.mUp.z;
+				lookUpDownJ = g_lookupdown;
+			}
+			g_lookupdown = 16.0;
+			//objCamera.Position_Camera(0.13f, 3.2f, 8.95f, 0.13f, 3.2f, 5.95f, 0, 1, 0);
+			objCamera.Position_Camera(4.36f, 15.8f, 30.82f, 4.15f, 15.8f, 27.82f, 0, 1, 0);
+			break;
+		case '1':	//Cuarto
+			banderaCC = true;	//Estamos en camara cuarto.
+			if (banderaCO == true) {
+				//Si viene de cámara original, no debe cambiar nada de los estados anteriores de la cámara para Cuarto y Juego
+				pos_xC = pos_xC;
+				pos_yC = pos_yC;
+				pos_zC = pos_zC;
+				view_xC = view_xC;
+				view_yC = view_yC;
+				view_zC = view_zC;
+				up_xC = up_xC;
+				up_yC = up_yC;
+				up_zC = up_zC;
+				lookUpDownC = lookUpDownC;
+
+				banderaCO = false;
+				g_lookupdown = lookUpDownC;
+				objCamera.Position_Camera(pos_xC, pos_yC, pos_zC, view_xC, view_yC, view_zC, up_xC, up_yC, up_zC);
+			}
+			else {
+				//Reviso el estado de las otras cámaras. De por si, banderaCO ya se sabe es false.
+				//Primero, reviso si CJ estaba previamente true, de modo que se sabe que viene de esa cámara.
+				if (banderaCJ == true) {
+					//Viene de Camara Juego
+					banderaCJ = false;//quitamos bandera CJ
+					//Guardo valores de la camara anterior (Juego)
+					pos_xJ = objCamera.mPos.x;
+					pos_yJ = objCamera.mPos.y;
+					pos_zJ = objCamera.mPos.z;
+					view_xJ = objCamera.mView.x;
+					view_yJ = objCamera.mView.y;
+					view_zJ = objCamera.mView.z;
+					up_xJ = objCamera.mUp.x;
+					up_yJ = objCamera.mUp.y;
+					up_zJ = objCamera.mUp.z;
+					lookUpDownJ = g_lookupdown;
+				}
+				//Si es false, quiere decir que es o la primera vez que entra o viene de CO sin haberse metido a CJ
+				g_lookupdown = lookUpDownC;
+				objCamera.Position_Camera(pos_xC, pos_yC, pos_zC, view_xC, view_yC, view_zC, up_xC, up_yC, up_zC);
+			}
+		
+			break;
+		case '2':	//Juego
+			banderaCJ = true;
+			if (banderaCO == true) {
+				//Si viene de cámara original, no debe cambiar nada de los estados anteriores de la cámara para Cuarto y Juego
+				pos_xJ = pos_xJ;
+				pos_yJ = pos_yJ;
+				pos_zJ = pos_zJ;
+				view_xJ = view_xJ;
+				view_yJ = view_yJ;
+				view_zJ = view_zJ;
+				up_xJ = up_xJ;
+				up_yJ = up_yJ;
+				up_zJ = up_zJ;
+				lookUpDownJ = lookUpDownJ;
+				banderaCO = false;
+				g_lookupdown = lookUpDownJ;
+				objCamera.Position_Camera(pos_xJ, pos_yJ, pos_zJ, view_xJ, view_yJ, view_zJ, up_xJ, up_yJ, up_zJ);
+			}
+			else {
+				//Reviso el estado de las otras cámaras. De por si, banderaCO ya se sabe es false.
+				//Primero, reviso si CC estaba previamente true, de modo que se sabe que viene de esa cámara.
+				if (banderaCC == true) {
+					//Viene de Camara Juego
+					banderaCC = false;//quitamos bandera CJ
+					//Guardo valores de la camara anterior (Cuarto)
+					pos_xC = objCamera.mPos.x;
+					pos_yC = objCamera.mPos.y;
+					pos_zC = objCamera.mPos.z;
+					view_xC = objCamera.mView.x;
+					view_yC = objCamera.mView.y;
+					view_zC = objCamera.mView.z;
+					up_xC = objCamera.mUp.x;
+					up_yC = objCamera.mUp.y;
+					up_zC = objCamera.mUp.z;
+					lookUpDownC = g_lookupdown;
+				}
+				//Si es false, quiere decir que es o la primera vez que entra o viene de CO sin haberse metido a CC
+				g_lookupdown = lookUpDownJ;
+				objCamera.Position_Camera(pos_xJ, pos_yJ, pos_zJ, view_xJ, view_yJ, view_zJ, up_xJ, up_yJ, up_zJ);
+			}
+			break;
+		case '3':	//
+			if (banderaPuerta == false) {
+				banderaPuerta = true;
+				if (rotPuerta == 0)
+					banderaUpDown = true;	//Va de 0 a 90
+				else
+					banderaUpDown = false;	//Va de 90 a 0;
+			}
+			break;
+		case '4':	//
+			if (banderaVentana == false) {
+				banderaVentana = true;
+				if (rotVentana == 0)
+					banderaUpDown = true;	//Va de 0 a 90
+				else
+					banderaUpDown = false;
+			}
+			break;
+		case '5':
+			break;
+		case '6':
+			rotSillon += 1.0;
+			printf("rot = %f\n", rotSillon);
+			break;
+		case '7':
+			rotSillon -= 1.0;
+			printf("rot = %f\n", rotSillon);
+			break;
+		case 'j':
+			trax += 0.1;
+			printf("x = %f\ty = %f\tz = %f\n", trax,tray,traz);
+			break;
+		case 'i':
+			tray += 0.1;
+			printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
+			break;
+		case 'k':
+			traz += 0.1;
+			printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
+			break;
+		case 'J':
+			trax -= 0.1;
+			printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
+			break;
+		case 'I':
+			tray -= 0.1;
+			printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
+			break;
+		case 'K':
+			traz -= 0.1;
+			printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
+			break;
+		case 'b':
+			scaleX += 0.01;
+			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+			break;
+		case 'B':
+			scaleX -= 0.01;
+			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+			break;
+		case 'n':
+			scaleY += 0.01;
+			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+			break;
+		case 'N':
+			scaleY -= 0.01;
+			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+			break;
+		case 'm':
+			scaleZ += 0.01;
+			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+			break;
+		case 'M':
+			scaleZ -= 0.01;
+			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+			break;
+		case 27:        // Cuando Esc es presionado...
+			exit(0);   // Salimos del programa
+			break;
+		default:        // Cualquier otra
+			break;
 	}
 
 	glutPostRedisplay();
@@ -1024,32 +1058,32 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 void arrow_keys(int a_keys, int x, int y)  // Funcion para manejo de teclas especiales (arrow keys)
 {
 	switch (a_keys) {
-	case GLUT_KEY_PAGE_UP:
-		objCamera.UpDown_Camera(CAMERASPEED);
-		break;
+		case GLUT_KEY_PAGE_UP:
+			objCamera.UpDown_Camera(CAMERASPEED);
+			break;
 
-	case GLUT_KEY_PAGE_DOWN:
-		objCamera.UpDown_Camera(-CAMERASPEED);
-		break;
+		case GLUT_KEY_PAGE_DOWN:
+			objCamera.UpDown_Camera(-CAMERASPEED);
+			break;
 
-	case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
-		g_lookupdown -= 1.0f;
-		break;
+		case GLUT_KEY_UP:     // Presionamos tecla ARRIBA...
+			g_lookupdown -= 1.0f;
+			break;
 
-	case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
-		g_lookupdown += 1.0f;
-		break;
+		case GLUT_KEY_DOWN:               // Presionamos tecla ABAJO...
+			g_lookupdown += 1.0f;
+			break;
 
-	case GLUT_KEY_LEFT:
-		objCamera.Rotate_View(-CAMERASPEED);
-		break;
+		case GLUT_KEY_LEFT:
+			objCamera.Rotate_View(-CAMERASPEED);
+			break;
 
-	case GLUT_KEY_RIGHT:
-		objCamera.Rotate_View(CAMERASPEED);
-		break;
+		case GLUT_KEY_RIGHT:
+			objCamera.Rotate_View(CAMERASPEED);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 	glutPostRedisplay();
 }

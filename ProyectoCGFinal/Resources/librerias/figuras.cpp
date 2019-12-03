@@ -221,6 +221,7 @@ void CFiguras::prisma3(GLuint text, GLuint text2)  //Funcion creacion prisma
 		glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[7]);
 	glEnd();
 }
+
 void CFiguras::prisma2 (GLuint text, GLuint text2)  //Funcion creacion prisma
 {
 
@@ -372,9 +373,6 @@ void CFiguras::prisma_anun (GLuint text, GLuint text2)  //Funcion creacion prism
 		glEnd();
 }
 
-
-
-
 void CFiguras::esfera(GLfloat radio, int meridianos, int paralelos, GLuint text )
 {
 	
@@ -409,7 +407,6 @@ void CFiguras::esfera(GLfloat radio, int meridianos, int paralelos, GLuint text 
 		}
 	}
 }
-
 
 void CFiguras::torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos )
 {
@@ -580,6 +577,8 @@ void CFiguras::cilindro(float radio, float altura, int resolucion, GLuint text)
 		glEnd();
 	}
 }	
+
+
 
 void CFiguras::piso(GLuint text) {
 	GLfloat vertice[8][3] = {
@@ -843,5 +842,23 @@ void CFiguras::puerta(GLuint text) {
 		glTexCoord2f(0.678f, 0.0f);	 glVertex3fv(vertice[0]);
 		glTexCoord2f(0.31f, 0.0f);	 glVertex3fv(vertice[3]);
 		glTexCoord2f(0.31f, 0.96f);  glVertex3fv(vertice[2]);
+	glEnd();
+}
+
+void CFiguras::ventana(GLuint text, float textX, float textY) {
+	GLfloat vertice[4][3] = {
+			{-0.4 ,0.0, 0.0},	 //Coordenadas Vertice 12 Vea	Ventana
+			{0.4 ,0.0, 0.0},	 //Coordenadas Vertice 13 Veb
+			{0.4 ,-0.4, 0.0},	 //Coordenadas Vertice 14 Vec
+			{-0.4 ,-0.4, 0.0},	 //Coordenadas Vertice 15 Ved
+	};
+
+	glBindTexture(GL_TEXTURE_2D, text);
+	glBegin(GL_POLYGON);
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.75f); glVertex3fv(vertice[0]);
+	glTexCoord2f(1.0f, 0.75f);	 glVertex3fv(vertice[1]);
+	glTexCoord2f(1.0f, 0.25f);	 glVertex3fv(vertice[2]);
+	glTexCoord2f(0.0f, 0.25f);  glVertex3fv(vertice[3]);
 	glEnd();
 }
