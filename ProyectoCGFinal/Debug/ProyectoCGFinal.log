@@ -1,2 +1,54 @@
-﻿  main.cpp
+﻿  figuras.cpp
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(12,9): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(12,21): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(12,33): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(13,10): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(13,22): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(13,35): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(14,10): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(14,22): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(14,36): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(15,9): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(15,21): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(15,35): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(16,9): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(16,20): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(16,33): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(17,9): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(17,20): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(17,34): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(18,10): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(18,21): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(18,35): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(19,10): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(19,21): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(19,34): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(82,9): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(82,21): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(82,33): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(83,10): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(83,22): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(83,35): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(84,10): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(84,22): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(84,36): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(85,9): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(85,21): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(85,35): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(86,9): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(86,20): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(86,33): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(87,9): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(87,20): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(87,34): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(88,10): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(88,21): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(88,35): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(89,10): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(89,21): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(89,34): warning C4838: la conversión de 'double' en 'GLfloat' requiere una conversión de restricción
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(383,11): warning C4101: 'theta': variable local sin referencia
+  main.cpp
+  Generando código...
+D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Resources\librerias\figuras.cpp(383,18): warning C4101: 'phi': variable local sin referencia
   ProyectoCGFinal.vcxproj -> D:\Bibliotecas\Documentos\GitHub\ProyectoTania\ProyectoCGFinal\Debug\ProyectoCGFinal.exe

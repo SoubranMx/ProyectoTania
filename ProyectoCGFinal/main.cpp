@@ -28,7 +28,7 @@ DWORD dwLastUpdateTime = 0;
 DWORD dwElapsedTime = 0;
 
 CCamera objCamera;
-GLfloat g_lookupdown = 0.0f;    // Look Position In The Z-Axis (NEW) 
+GLfloat g_lookupdown = 16.0f;    // Look Position In The Z-Axis (NEW) 
 
 int font = (int)GLUT_BITMAP_HELVETICA_18;
 
@@ -42,13 +42,19 @@ GLfloat m_spec1[] = { 0.0, 0.0, 0.0, 1.0 };				// Specular Light Values
 GLfloat m_amb1[] = { 0.0, 0.0, 0.0, 1.0 };				// Ambiental Light Values
 GLfloat m_s1[] = { 18 };
 
+
+//TEXTURAS
+//CTexture t_pasto;
 CTexture cielo;
 CFiguras fig1;
 CFiguras fig3;
 
-//TEXTURAS
-//CTexture t_pasto;
 CTexture t_piso;
+CTexture t_pared1;
+CTexture t_pared2;
+CTexture t_pisoM;
+CTexture t_wall;
+CTexture t_door;
 //END TEXTURAS
 
 // MODELOS
@@ -66,6 +72,10 @@ CTexture t_piso;
 */
 //Figuras a "mano"
 CFiguras pisoGeneral;
+CFiguras silla;
+CFiguras mesa;
+CFiguras cuarto;
+CFiguras puerta;
 
 //Figuras de 3D Studio
 CModel sofa;
@@ -81,16 +91,24 @@ float  Lx = 0.0;
 float  Ly = 0.0;
 float  Lz = 0.0;
 float aux = 0.0;
+//glTranslatef(3.8, 4.5, 9.0);
+float trax = 3.6;
+float tray = 4.7;
+float traz = 8.05;
+float textX = 0.0;
+float textY = 0.0;
 
 // BANDERAS
 bool banderaCG = false;	//para mostrar las PC, son pesadas.
 bool banderaCJ = false;	//Visualización de Camara enfocada en el Juego
 bool banderaCC = false;	//Visualización de Camara enfocada en el cuarto
 bool banderaCO = false;	//Visualización de Camara original
+bool banderaPuerta = false;
+bool banderaUpDown = false;
 // END BANDERAS
 
 //ANIMACION
-
+float rotPuerta = 0.0f;
 //END ANIMACION
 
 //CAMARA
@@ -139,21 +157,25 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	t_piso.BuildGLTexture();
 	t_piso.ReleaseImage();
 
-	/*
-	t_pasto.LoadTGA("Texturas/pasto.tga");
-	t_pasto.BuildGLTexture();
-	t_pasto.ReleaseImage();
+	t_pared1.LoadTGA("Resources/Texturas/pared1.tga");
+	t_pared1.BuildGLTexture();
+	t_pared1.ReleaseImage();
 
-	t_LabCG[0] = t_fumar.GLindex;
-	t_LabCG[1] = t_comer.GLindex;
-	t_LabCG[2] = t_hablar.GLindex;
-	t_LabCG[3] = t_celular.GLindex;
-	t_LabCG[4] = t_pizarron.GLindex;
-	t_LabCG[5] = t_ventana.GLindex;
-	t_LabCG[6] = t_pisoCG.GLindex;
-	t_LabCG[7] = t_metalCG.GLindex;
-	t_LabCG[8] = t_techoCG.GLindex;
-*/
+	t_pared2.LoadTGA("Resources/Texturas/pared2.tga");
+	t_pared2.BuildGLTexture();
+	t_pared2.ReleaseImage();
+
+	t_door.LoadTGA("Resources/Texturas/door.tga");
+	t_door.BuildGLTexture();
+	t_door.ReleaseImage();
+
+	t_wall.LoadTGA("Resources/Texturas/wall.tga");
+	t_wall.BuildGLTexture();
+	t_wall.ReleaseImage();
+
+	t_pisoM.LoadTGA("Resources/Texturas/pisoMadera.tga");
+	t_pisoM.BuildGLTexture();
+	t_pisoM.ReleaseImage();
 
 //Carga de Figuras
 /*
@@ -166,30 +188,30 @@ void InitGL(GLvoid)     // Inicializamos parametros
 //	mViewX 0.13	mViewY 3.2	mViewZ 5.95
 //	mUpX 0.0	mUpY 1.0	mUpZ 0.0
 //	glookupdown 0.0
-	objCamera.Position_Camera(0.13f, 3.2f, 8.95f, 0.13f, 3.2f, 5.95f, 0, 1, 0);
+	objCamera.Position_Camera(4.36f, 15.8f, 30.82f, 4.15f, 15.8f, 27.82f, 0, 1, 0);
 
 	//Posiciones de cámaras para Juego y Cuarto iniciales
-	pos_xC = 7.18 ;
-	pos_yC = 42.8;
-	pos_zC = -5.63;
-	view_xC = 7.18;
-	view_yC = 44.5;
-	view_zC = -8.63;
+	pos_xC = 6.945;
+	pos_yC = 17.2;
+	pos_zC = 7.034;
+	view_xC = 5.35;
+	view_yC = 17.2;
+	view_zC = 4.485;
 	up_xC = 0.0;
 	up_yC = 1.0;
 	up_zC = 0.0;
-	lookUpDownC = 119.0;
+	lookUpDownC = 46.0;
 
-	pos_xJ = 2.95;
-	pos_yJ = 3.9;
-	pos_zJ = 44.59;
-	view_xJ = 2.95;
-	view_yJ = 3.9;
-	view_zJ = 41.59;
+	pos_xJ = -2.69;
+	pos_yJ = 6.7;
+	pos_zJ = -0.77;
+	view_xJ = -2.69;
+	view_yJ = 6.7;
+	view_zJ = -3.77;
 	up_xJ = 0.0;
 	up_yJ = 1.0;
 	up_zJ = 0.0;
-	lookUpDownJ = 0.0;
+	lookUpDownJ = 90.0;
 }
 
 void pintaTexto(float x, float y, float z, void* font, char* string)
@@ -202,6 +224,27 @@ void pintaTexto(float x, float y, float z, void* font, char* string)
 	{
 		glutBitmapCharacter(font, *c); //imprime
 	}
+}
+
+void createMesa() {
+	/*Jerarquía:
+		* Pivote central
+		* Patas
+		* Soporte
+		* Mesa cuadrada
+
+		De modo que, si gira el pivote, gira todo el modelo.
+		Si gira la mesa cuadrada, solo gira ésta.
+	*/
+	glPushMatrix();
+		glTranslatef(0.0, 1.0, 0.0);
+		glScalef(2.0, 0.2, 2.0);
+		glDisable(GL_LIGHTING);
+		mesa.mesa(0, 10.0, 10.0, 0.04);
+		glPushMatrix();
+		glPopMatrix();
+		glEnable(GL_LIGHTING);
+	glPopMatrix();
 }
 
 void jardineras() {
@@ -424,7 +467,7 @@ void display(void)   // Creamos la funcion donde se dibuja
 
 		glPushMatrix(); //Piso primario
 			glTranslatef(0.0, 0.0, 0.0);
-			glScalef(10, 0.2, 10);
+			glScalef(20, 0.2, 20);
 			glDisable(GL_LIGHTING);
 			pisoGeneral.piso(t_piso.GLindex);
 			glEnable(GL_LIGHTING);
@@ -437,18 +480,32 @@ void display(void)   // Creamos la funcion donde se dibuja
 				fig1.skybox(130.0, 130.0, 130.0, cielo.GLindex);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
-/*
-		glPushMatrix();	//Torre Izquierda
-			glTranslatef(-8.0, 8.502, -5.0);
-			glScalef(10.0, 15.0, 10.0);
+		glPopMatrix();
+		//Pivot 0,0,0
+		//createCuarto();
+		glPushMatrix();
+			glTranslatef(0.0, 9.15, -1.0);
+			glScalef(18.0, 18.0, 18.0);
 			glDisable(GL_LIGHTING);
-			torreIzquierda.torreMedia(t_tile1.GLindex, t_tile1.GLindex, 10.0, 15.0, 10.0);
+			cuarto.cuarto(t_pared1.GLindex, t_pared2.GLindex, t_pisoM.GLindex, 1.0);
 			glEnable(GL_LIGHTING);
 		glPopMatrix();
-*/
-		//jardineras();
-		//pruebas();
-		//laboratorio();
+		glPushMatrix();
+			glTranslatef(0.0, 9.195, -1.0);
+			glScalef(18.1, 18.1, 18.1);
+			glDisable(GL_LIGHTING);
+			cuarto.cuarto(t_wall.GLindex, t_wall.GLindex, t_wall.GLindex, -1.0);
+			glEnable(GL_LIGHTING);
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef(trax, tray, traz);
+			glRotatef(rotPuerta, 0.0, 1.0, 0.0);
+			glScalef(18.1, 18.1, 1.0);
+			glDisable(GL_LIGHTING);
+			puerta.puerta(t_door.GLindex);
+			glEnable(GL_LIGHTING);
+		glPopMatrix();
+		//createPuerta();
 	glPopMatrix();	//General
 
 	glDisable(GL_TEXTURE_2D);
@@ -481,57 +538,32 @@ void animacion()
 
 	if (dwElapsedTime >= 150)
 	{
-		//Animacion Pizarron
-		/*
-		if (f_PizarronCG == true) {
-
-			if (iPizCG >= 0) {
-				iPizCG -= 0.2;
-				if (jPizCG <= 1.0) {
-					jPizCG += 0.166;
-				}
-				else
-					jPizCG = 0.0;
-			}
-			else {
-				iPizCG = 1.0;
-			}
-		}
-		*/
-
+		//Animacion Puerta
+		/*if (rotPuerta == 0)
+			rotPuerta += 1;
+		else if (rotPuerta == 90)
+			rotPuerta -= 1;*/
 		dwLastUpdateTime = dwCurrentTime;
 	}
 	if (dwElapsedTime >= 30)
 	{
-		/*
-		if (f_TreeCG == true) {
-			if (jTree <= 10) {
-				jTree += 0.2;
-				iTree += 1.5;
+		if (banderaPuerta == true) {
+			if (banderaUpDown == true) {	//Va de 0 a 90
+				rotPuerta += 2.0;
+				if (rotPuerta == 90.0)
+					banderaPuerta = false;
 			}
 			else {
-				jTree = 0.0;
-				iTree = 0.0;
+				rotPuerta -= 2.0;
+				if (rotPuerta == 0.0)
+					banderaPuerta = false;
 			}
 		}
-		*/
 		dwLastUpdateTime = dwCurrentTime;
 	}
 	if (dwElapsedTime >= 30)
 	{
-		/*
-		if (f_LampCG == true) {
-			if (iLamp <= 500) {
-				iLamp += 2;
-			}
-			else
-				iLamp = 0;
-			if (jLamp <= 500) {
-				jLamp += 2;
-			}
-			else
-				jLamp = 0;
-		}*/
+		
 		dwLastUpdateTime = dwCurrentTime;
 	}
 
@@ -624,8 +656,9 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 			up_zJ = objCamera.mUp.z;
 			lookUpDownJ = g_lookupdown;
 		}
-		g_lookupdown = 0.0;
-		objCamera.Position_Camera(0.13f, 3.2f, 8.95f, 0.13f, 3.2f, 5.95f, 0, 1, 0);
+		g_lookupdown = 16.0;
+		//objCamera.Position_Camera(0.13f, 3.2f, 8.95f, 0.13f, 3.2f, 5.95f, 0, 1, 0);
+		objCamera.Position_Camera(4.36f, 15.8f, 30.82f, 4.15f, 15.8f, 27.82f, 0, 1, 0);
 		break;
 	case '1':	//Cuarto
 		banderaCC = true;	//Estamos en camara cuarto.
@@ -712,15 +745,40 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 		}
 		break;
 	case '3':	//
-		
+		if (banderaPuerta == false) {
+			banderaPuerta = true;
+			if (rotPuerta == 0)
+				banderaUpDown = true;	//Va de 0 a 90
+			else
+				banderaUpDown = false;	//Va de 90 a 0;
+		}
 		break;
 	case '4':	//
-		
 		break;
 	case '5':
+		break;
+	case '6':
 		
 		break;
 	case '7':
+		
+		break;
+	case 'j':
+		
+		break;
+	case 'i':
+		
+		break;
+	case 'k':
+		
+		break;
+	case 'J':
+		
+		break;
+	case 'I':
+		
+		break;
+	case 'K':
 		
 		break;
 	case 27:        // Cuando Esc es presionado...
