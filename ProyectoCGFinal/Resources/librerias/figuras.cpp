@@ -665,10 +665,10 @@ void CFiguras::mesa(GLuint text, float f, float lx, float ly) {
 	glBindTexture(GL_TEXTURE_2D, text);
 	glBegin(GL_POLYGON);	//Front
 		glNormal3f(0.0f, 0.0f, 1.0f);
-		glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[0]);
-		glTexCoord2f(0.0f, ly); glVertex3fv(vertice[4]);
-		glTexCoord2f(lx, ly); glVertex3fv(vertice[7]);
-		glTexCoord2f(lx, 0.0f); glVertex3fv(vertice[1]);
+		glTexCoord2f(lx, 0.0f); glVertex3fv(vertice[0]);
+		glTexCoord2f(lx, ly); glVertex3fv(vertice[4]);
+		glTexCoord2f(0.0f, ly); glVertex3fv(vertice[7]);
+		glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[1]);
 	glEnd();
 	
 	glBegin(GL_POLYGON);	//Right
@@ -681,10 +681,10 @@ void CFiguras::mesa(GLuint text, float f, float lx, float ly) {
 	
 	glBegin(GL_POLYGON);	//Back
 		glNormal3f(0.0f, 0.0f, -1.0f);
-		glTexCoord2f(0.0f, ly); glVertex3fv(vertice[6]);
-		glTexCoord2f(lx, ly); glVertex3fv(vertice[5]);
-		glTexCoord2f(lx, 0.0f); glVertex3fv(vertice[3]);
-		glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[2]);
+		glTexCoord2f(lx, ly); glVertex3fv(vertice[6]);
+		glTexCoord2f(0.0f, ly); glVertex3fv(vertice[5]);
+		glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[3]);
+		glTexCoord2f(lx, 0.0f); glVertex3fv(vertice[2]);
 	glEnd();
 
 	glBegin(GL_POLYGON);  //Left
