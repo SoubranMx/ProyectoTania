@@ -87,6 +87,22 @@ CModel librero;
 CModel foco;
 CModel lampara;
 CModel arcade;
+
+CModel chess;
+
+CModel bPeon;
+CModel bCaballo;
+CModel bTorre;
+CModel bAlfil;
+CModel bRey;
+CModel bReina;
+
+CModel nPeon;
+CModel nCaballo;
+CModel nTorre;
+CModel nAlfil;
+CModel nRey;
+CModel nReina;
 //END MODELOS
 
 //Auxiliares para dejar en su lugar cualquier cosa cuando la mueves con 568 o kli
@@ -203,10 +219,20 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	//arcade.VertexNormals();
 	librero._3dsLoad("Resources/Modelos/estante3.3DS");
 	//librero.VertexNormals();
-/*
-	streetLamp._3dsLoad("Modelos/streetLamp.3DS");
-	streetLamp.VertexNormals();
-*/
+
+	chess._3dsLoad("Resources/Modelos/Chess/chessboard.3DS");
+	bPeon._3dsLoad("Resources/Modelos/Chess/pawnB.3DS");
+	nPeon._3dsLoad("Resources/Modelos/Chess/pawnN.3DS");
+	bTorre._3dsLoad("Resources/Modelos/Chess/towerB.3DS");
+	nTorre._3dsLoad("Resources/Modelos/Chess/towerN.3DS");
+	bAlfil._3dsLoad("Resources/Modelos/Chess/bishopB.3DS");
+	nAlfil._3dsLoad("Resources/Modelos/Chess/bishopN.3DS");
+	bCaballo._3dsLoad("Resources/Modelos/Chess/horseB.3DS");
+	nCaballo._3dsLoad("Resources/Modelos/Chess/horseN.3DS");
+	bRey._3dsLoad("Resources/Modelos/Chess/kingB.3DS");
+	nRey._3dsLoad("Resources/Modelos/Chess/kingN.3DS");
+	bReina._3dsLoad("Resources/Modelos/Chess/queenB.3DS");
+	nReina._3dsLoad("Resources/Modelos/Chess/queenN.3DS");
 
 	//Posición de cámara inicial
 //	mPosX 0.13	mPosY 3.2	mPosZ 8.95
@@ -227,16 +253,16 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	up_zC = 0.0;
 	lookUpDownC = 46.0;
 
-	pos_xJ = -2.69;
-	pos_yJ = 6.7;
-	pos_zJ = -0.77;
-	view_xJ = -2.69;
-	view_yJ = 6.7;
-	view_zJ = -3.77;
+	pos_xJ = -4.1;
+	pos_yJ = 9.5;
+	pos_zJ = 0.04;
+	view_xJ = -4.1;
+	view_yJ = 9.5;
+	view_zJ = -2.96;
 	up_xJ = 0.0;
 	up_yJ = 1.0;
 	up_zJ = 0.0;
-	lookUpDownJ = 90.0;
+	lookUpDownJ = 73.0;
 }
 
 void pintaTexto(float x, float y, float z, void* font, char* string)
@@ -469,6 +495,172 @@ void createSillas() {
 	glPopMatrix();
 }
 
+void peonBl() {
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.0);
+		bPeon.GLrender(NULL, _SHADED, 1.0);
+		glPushMatrix();
+			glTranslatef(4.5, 0.0, 0.0);
+			bPeon.GLrender(NULL, _SHADED, 1.0);
+			glPushMatrix();
+				glTranslatef(4.5, 0.0, 0.0);
+				bPeon.GLrender(NULL, _SHADED, 1.0);
+				glPushMatrix();
+					glTranslatef(4.5, 0.0, 0.0);
+					bPeon.GLrender(NULL, _SHADED, 1.0);
+					glPushMatrix();
+						glTranslatef(4.5, 0.0, 0.0);
+						bPeon.GLrender(NULL, _SHADED, 1.0);
+						glPushMatrix();
+							glTranslatef(4.5, 0.0, 0.0);
+							bPeon.GLrender(NULL, _SHADED, 1.0);
+							glPushMatrix();
+								glTranslatef(4.5, 0.0, 0.0);
+								bPeon.GLrender(NULL, _SHADED, 1.0);
+								glPushMatrix();
+									glTranslatef(4.5, 0.0, 0.0);
+									bPeon.GLrender(NULL, _SHADED, 1.0);
+								glPopMatrix();
+							glPopMatrix();
+						glPopMatrix();
+					glPopMatrix();
+				glPopMatrix();
+			glPopMatrix();
+		glPopMatrix();
+	glPopMatrix();
+
+	/*for (int i = 0; i <= 7; i++) {
+		bPeon.GLrender(NULL, _SHADED, 1.0);
+		glTranslatef(4.5,0.0,0.0);
+	}*/
+}
+
+void peonNe() {
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.0);
+		nPeon.GLrender(NULL, _SHADED, 1.0);
+		glPushMatrix();
+			glTranslatef(-4.5, 0.0, 0.0);
+			nPeon.GLrender(NULL, _SHADED, 1.0);
+			glPushMatrix();
+				glTranslatef(-4.5, 0.0, 0.0);
+				nPeon.GLrender(NULL, _SHADED, 1.0);
+				glPushMatrix();
+					glTranslatef(-4.5, 0.0, 0.0);
+					nPeon.GLrender(NULL, _SHADED, 1.0);
+					glPushMatrix();
+						glTranslatef(-4.5, 0.0, 0.0);
+						nPeon.GLrender(NULL, _SHADED, 1.0);
+						glPushMatrix();
+							glTranslatef(-4.5, 0.0, 0.0);
+							nPeon.GLrender(NULL, _SHADED, 1.0);
+							glPushMatrix();
+								glTranslatef(-4.5, 0.0, 0.0);
+								nPeon.GLrender(NULL, _SHADED, 1.0);
+								glPushMatrix();
+									glTranslatef(-4.5, 0.0, 0.0);
+									nPeon.GLrender(NULL, _SHADED, 1.0);
+								glPopMatrix();
+							glPopMatrix();
+						glPopMatrix();
+					glPopMatrix();
+				glPopMatrix();
+			glPopMatrix();
+		glPopMatrix();
+	glPopMatrix();
+
+	/*for (int i = 0; i <= 7; i++) {
+		bPeon.GLrender(NULL, _SHADED, 1.0);
+		glTranslatef(4.5,0.0,0.0);
+	}*/
+}
+
+void caballoBl() {
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.0);
+		bCaballo.GLrender(NULL, _SHADED, 1.0);
+		glPushMatrix();
+			glTranslatef(22.5, 0.0, 0.0);
+			bCaballo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	glPopMatrix();
+}
+
+void caballoNe() {
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.0);
+		nCaballo.GLrender(NULL, _SHADED, 1.0);
+		glPushMatrix();
+			glTranslatef(22.5, 0.0, 0.0);
+			nCaballo.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	glPopMatrix();
+}
+
+void alfilBl() {
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.0);
+		bAlfil.GLrender(NULL, _SHADED, 1.0);
+		glPushMatrix();
+			glTranslatef(13.5, 0.0, 0.0);
+			bAlfil.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	glPopMatrix();
+}
+
+void alfilNe() {
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.0);
+		nAlfil.GLrender(NULL, _SHADED, 1.0);
+		glPushMatrix();
+			glTranslatef(13.5, 0.0, 0.0);
+			nAlfil.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	glPopMatrix();
+}
+
+void torreBl() {
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.0);
+		bTorre.GLrender(NULL, _SHADED, 1.0);
+		glPushMatrix();
+			glTranslatef(31.5, 0.0, 0.0);
+			bTorre.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	glPopMatrix();
+}
+
+void torreNe() {
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.0);
+		nTorre.GLrender(NULL, _SHADED, 1.0);
+		glPushMatrix();
+			glTranslatef(31.5, 0.0, 0.0);
+			nTorre.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
+	glPopMatrix();
+}
+
+void createChess() {
+	glPushMatrix();
+		glTranslatef(-3.6, 6.4, -1.4);
+		glScalef(0.08, 0.08, 0.08);
+		chess.GLrender(NULL, _SHADED, 1.0);
+		peonBl();
+		peonNe();
+		alfilBl();
+		alfilNe();
+		caballoBl();
+		caballoNe();
+		torreBl();
+		torreNe();
+		bReina.GLrender(NULL, _SHADED, 1.0);
+		bRey.GLrender(NULL, _SHADED, 1.0);
+		nReina.GLrender(NULL, _SHADED, 1.0);
+		nRey.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+}
+
 void display(void)   // Creamos la funcion donde se dibuja
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -503,7 +695,7 @@ void display(void)   // Creamos la funcion donde se dibuja
 		createCuarto();
 		createPuerta();
 		createMuebles();
-
+		createChess();
 		//Sin esto, se queda el color del material del estante? why???
 		glDisable(GL_LIGHTING);
 		glDisable(GL_COLOR_MATERIAL);
@@ -772,27 +964,27 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 		printf("rot = %f\n", rotSillon);
 		break;
 	case 'j':
-		trax += 0.01;
+		trax += 0.1;
 		printf("x = %f\ty = %f\tz = %f\n", trax,tray,traz);
 		break;
 	case 'i':
-		tray += 0.01;
+		tray += 0.1;
 		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
 		break;
 	case 'k':
-		traz += 0.01;
+		traz += 0.1;
 		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
 		break;
 	case 'J':
-		trax -= 0.01;
+		trax -= 0.1;
 		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
 		break;
 	case 'I':
-		tray -= 0.01;
+		tray -= 0.1;
 		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
 		break;
 	case 'K':
-		traz -= 0.01;
+		traz -= 0.1;
 		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
 		break;
 	case 'b':
