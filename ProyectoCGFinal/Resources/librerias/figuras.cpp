@@ -662,7 +662,7 @@ void CFiguras::mesa(GLuint text, float f, float lx, float ly) {
 	/*float f = 10.0f;
 	float lx = 10.0f;
 	float ly = 0.04f;*/
-	glBindTexture(GL_TEXTURE_2D, text);   // choose the texture to use.
+	glBindTexture(GL_TEXTURE_2D, text);
 	glBegin(GL_POLYGON);	//Front
 		glNormal3f(0.0f, 0.0f, 1.0f);
 		glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[0]);

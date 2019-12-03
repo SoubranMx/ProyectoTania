@@ -84,6 +84,7 @@ CModel tv;
 CModel librero;
 CModel foco;
 CModel lampara;
+CModel arcade;
 //END MODELOS
 
 //Auxiliares para dejar en su lugar cualquier cosa cuando la mueves con 568 o kli
@@ -92,12 +93,16 @@ float  Ly = 0.0;
 float  Lz = 0.0;
 float aux = 0.0;
 //glTranslatef(3.8, 4.5, 9.0);
-float trax = 3.6;
-float tray = 4.7;
-float traz = 8.05;
+float trax = 0.0;
+float tray = 0.0;
+float traz = 0.0;
 float textX = 0.0;
 float textY = 0.0;
+float rotSillon = 0.0;
 
+float scaleX = 0.0;
+float scaleY = 0.0;
+float scaleZ = 0.0;
 // BANDERAS
 bool banderaCG = false;	//para mostrar las PC, son pesadas.
 bool banderaCJ = false;	//Visualización de Camara enfocada en el Juego
@@ -178,6 +183,16 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	t_pisoM.ReleaseImage();
 
 //Carga de Figuras
+	sofa._3dsLoad("Resources/Modelos/sofa2.3DS");
+	//sofa.VertexNormals();
+	tv._3dsLoad("Resources/Modelos/TVs.3DS");
+	//tv.VertexNormals();
+	//muebleTV._3dsLoad("Resources/Modelos/TVMueble/HDTV_Entertainment_Center.3DS");
+	//muebleTV.VertexNormals();
+	//arcade._3dsLoad("Resources/Modelos/Arcade/arcade.3DS");
+	//arcade.VertexNormals();
+	librero._3dsLoad("Resources/Modelos/estante3.3DS");
+	//librero.VertexNormals();
 /*
 	streetLamp._3dsLoad("Modelos/streetLamp.3DS");
 	streetLamp.VertexNormals();
@@ -226,6 +241,55 @@ void pintaTexto(float x, float y, float z, void* font, char* string)
 	}
 }
 
+void patas() {
+	float disx = 1.0;
+	float disy = 0.4;
+	float disz = 0.4;
+	glPushMatrix();
+		glTranslatef(-0.7, 0.0, 0.0);
+		glScalef(disx, disy, disz);
+		mesa.mesa(t_piso.GLindex, 1.0, 1.0, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(0.7, 0.0, 0.0);
+		glScalef(disx, disy, disz);
+		mesa.mesa(t_piso.GLindex, 1.0, 1.0, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, -0.7);
+		glRotatef(90.0, 0.0, 1.0, 0.0);
+		glScalef(disx, disy, disz);
+		mesa.mesa(t_piso.GLindex, 1.0, 1.0, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.7);
+		glRotatef(90.0, 0.0, 1.0, 0.0);
+		glScalef(disx, disy, disz);
+		mesa.mesa(t_piso.GLindex, 1.0, 1.0, 1.0);
+	glPopMatrix();
+}
+
+void palo() {
+	glPushMatrix();
+		float scaleX = -0.6;
+		float scaleY = 3.45;
+		float scaleZ = -0.6;
+		//glScalef(1.0, 4.0, 1.0);
+		glScalef(1.0+scaleX, 1.0+scaleY, 1.0+scaleZ);
+		mesa.mesa(t_piso.GLindex, 1.0, 1.0, 1.0);
+	glPopMatrix();
+}
+
+void tabla() {
+	float scaleX = 2.0;
+	float scaleY = -0.6;
+	float scaleZ = 2.0;
+	glPushMatrix();
+		glTranslatef(0.0, 0.5, 0.0);
+		glScalef(1.0 + scaleX, 1.0 + scaleY, 1.0 + scaleZ);
+		mesa.mesa(t_piso.GLindex, 1.0, 1.0, 1.0);
+	glPopMatrix();
+}
 void createMesa() {
 	/*Jerarquía:
 		* Pivote central
@@ -237,22 +301,31 @@ void createMesa() {
 		Si gira la mesa cuadrada, solo gira ésta.
 	*/
 	glPushMatrix();
-		glTranslatef(0.0, 1.0, 0.0);
-		glScalef(2.0, 0.2, 2.0);
-		glDisable(GL_LIGHTING);
-		mesa.mesa(0, 10.0, 10.0, 0.04);
-		glPushMatrix();
-		glPopMatrix();
-		glEnable(GL_LIGHTING);
+		glTranslatef(1.35, 0.0, -0.3);
+		glTranslatef(-5.0, 0.4, -1.0);
+		glRotatef(rotSillon, 0.0, 1.0, 0.0);
+		glScalef(1.3 + scaleX, 1.3 + scaleY, 1.3 + scaleZ);
+		patas();
+		glTranslatef(0.0, 2.0, 0.0);
+		palo();
+		glTranslatef(0.0,1.925,0.0);
+		tabla();
 	glPopMatrix();
 }
 
-void jardineras() {
+void createCuarto() {
 	glPushMatrix();
-		glTranslatef(0.0, 0.5, -5.0);
-		glScalef(26.0, 1.0, 10.0);
+		glTranslatef(0.0, 9.15, -1.0);
+		glScalef(18.0, 18.0, 18.0);
 		glDisable(GL_LIGHTING);
-		//jardinera.torreMedia(t_tierra.GLindex, t_concreto.GLindex, 26.0, 1.0, 10.0);
+		cuarto.cuarto(t_pared1.GLindex, t_pared2.GLindex, t_pisoM.GLindex, 1.0);
+		glEnable(GL_LIGHTING);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(0.0, 9.195, -1.0);
+		glScalef(18.1, 18.1, 18.1);
+		glDisable(GL_LIGHTING);
+		cuarto.cuarto(t_wall.GLindex, t_wall.GLindex, t_wall.GLindex, -1.0);
 		glEnable(GL_LIGHTING);
 	glPopMatrix();
 }
@@ -477,35 +550,55 @@ void display(void)   // Creamos la funcion donde se dibuja
 			glPushMatrix(); //Creamos cielo
 				glDisable(GL_LIGHTING);
 				glTranslatef(0, 60, 0);
-				fig1.skybox(130.0, 130.0, 130.0, cielo.GLindex);
+				//fig1.skybox(130.0, 130.0, 130.0, cielo.GLindex);
 				glEnable(GL_LIGHTING);
 			glPopMatrix();
 		glPopMatrix();
 		//Pivot 0,0,0
-		//createCuarto();
+		glDisable(GL_LIGHTING);
+		createCuarto();
+		createMesa();
+		//createPuerta();
 		glPushMatrix();
-			glTranslatef(0.0, 9.15, -1.0);
-			glScalef(18.0, 18.0, 18.0);
-			glDisable(GL_LIGHTING);
-			cuarto.cuarto(t_pared1.GLindex, t_pared2.GLindex, t_pisoM.GLindex, 1.0);
-			glEnable(GL_LIGHTING);
-		glPopMatrix();
-		glPushMatrix();
-			glTranslatef(0.0, 9.195, -1.0);
-			glScalef(18.1, 18.1, 18.1);
-			glDisable(GL_LIGHTING);
-			cuarto.cuarto(t_wall.GLindex, t_wall.GLindex, t_wall.GLindex, -1.0);
-			glEnable(GL_LIGHTING);
-		glPopMatrix();
-		glPushMatrix();
-			glTranslatef(trax, tray, traz);
-			glRotatef(rotPuerta, 0.0, 1.0, 0.0);
+			glTranslatef(3.6, 4.7, 8.05);
+			glRotatef(rotPuerta, 0.0, 1.0, 0.0);	//rotPuerta sirve para la animación de abrir y cerrar puerta con tecla 3
 			glScalef(18.1, 18.1, 1.0);
 			glDisable(GL_LIGHTING);
 			puerta.puerta(t_door.GLindex);
 			glEnable(GL_LIGHTING);
 		glPopMatrix();
-		//createPuerta();
+
+
+		glPushMatrix();
+			glPushMatrix();
+				//SOFA
+				glPushMatrix();
+					glTranslatef(39.0, 0.0, -61.5);
+					glScalef(0.003, 0.007, 0.004);
+					glRotatef(180.0, 0.0, 1.0, 0.0);
+					sofa.GLrender(NULL, _SHADED, 1.0);
+				glPopMatrix();
+				//TV
+				glPushMatrix();
+					glTranslatef(8.52, 6.0, 5.0);
+					glScalef(0.01, 0.012, 0.01);
+					glRotatef(-90.0, 0.0, 1.0, 0.0);
+					tv.GLrender(NULL, _SHADED, 1.0);
+				glPopMatrix();
+				//LIBRERO
+				glScalef(0.03, 0.08, 0.08);
+				glRotatef(90.0, 0.0, 1.0, 0.0);
+				//glTranslatef(0.0, 0.0, -95.0);
+				glTranslatef(7.0, 0.0, -281.0);
+				librero.GLrender(NULL, _SHADED, 1.0);
+//				glEnable(GL_COLOR_MATERIAL);
+			glPopMatrix();
+			/*glPushMatrix();
+				glTranslatef(0.0, 0.0, 0.0);
+				glScalef(5.5, 5.5, 5.5);
+				sofa.GLrender(NULL, _SHADED, 1.0);
+			glPopMatrix();*/
+		glPopMatrix();
 	glPopMatrix();	//General
 
 	glDisable(GL_TEXTURE_2D);
@@ -584,7 +677,8 @@ void reshape(int width, int height)   // Creamos funcion Reshape
 
 	// Tipo de Vista
 
-	glFrustum(-0.1, 0.1, -0.1, 0.1, 0.1, 170.0);
+	//glFrustum(-0.1, 0.1, -0.1, 0.1, 0.1, 170.0);
+	glFrustum(-0.1, 0.1, -0.1, 0.1, 0.1, 1000.0);
 
 	glMatrixMode(GL_MODELVIEW);							// Seleccionamos Modelview Matrix
 	glLoadIdentity();
@@ -758,28 +852,60 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 	case '5':
 		break;
 	case '6':
-		
+		rotSillon += 1.0;
+		printf("rot = %f\n", rotSillon);
 		break;
 	case '7':
-		
+		rotSillon -= 1.0;
+		printf("rot = %f\n", rotSillon);
 		break;
 	case 'j':
-		
+		trax += 0.05;
+		printf("x = %f\ty = %f\tz = %f\n", trax,tray,traz);
 		break;
 	case 'i':
-		
+		tray += 0.05;
+		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
 		break;
 	case 'k':
-		
+		traz += 0.05;
+		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
 		break;
 	case 'J':
-		
+		trax -= 0.05;
+		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
 		break;
 	case 'I':
-		
+		tray -= 0.05;
+		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
 		break;
 	case 'K':
-		
+		traz -= 0.05;
+		printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
+		break;
+	case 'b':
+		scaleX += 0.05;
+		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+		break;
+	case 'B':
+		scaleX -= 0.05;
+		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+		break;
+	case 'n':
+		scaleY += 0.05;
+		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+		break;
+	case 'N':
+		scaleY -= 0.05;
+		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+		break;
+	case 'm':
+		scaleZ += 0.05;
+		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+		break;
+	case 'M':
+		scaleZ -= 0.05;
+		printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
 		break;
 	case 27:        // Cuando Esc es presionado...
 		exit(0);   // Salimos del programa
