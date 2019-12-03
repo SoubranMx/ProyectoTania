@@ -132,12 +132,16 @@ bool banderaCC = false;	//Visualización de Camara enfocada en el cuarto
 bool banderaCO = false;	//Visualización de Camara original
 bool banderaPuerta = false;
 bool banderaVentana = false;
+bool banderaSilla = false;
 bool banderaUpDown = false;
+bool banderaTrans = true;
 // END BANDERAS
 
 //ANIMACION
 float rotPuerta = 0.0f;
 float rotVentana = 0.0f;
+float rotSilla = 0.0f;
+float transSilla = 0.0f;
 //END ANIMACION
 
 //CAMARA
@@ -383,7 +387,7 @@ void createPuerta() {
 
 void createVentana() {
 	glPushMatrix();
-		glTranslatef(0.0+trax, 14.5+tray, -10.0+traz);
+		glTranslatef(0.0, 14.5, -10.0);
 		glRotatef(rotVentana, 1.0, 0.0, 0.0);	//rotVentana sirve para la animación de abrir y cerrar puerta con tecla 4
 		glScalef(18.0+scaleX, 18.0+scaleY, 1.0);
 		glDisable(GL_LIGHTING);
@@ -419,10 +423,11 @@ void createMuebles() {
 	glPopMatrix();
 }
 
-void cSilla() {
+void cSilla(float rotS) {
 	glPushMatrix();
 		//Pivote a 3.1 de distancia del centro del origen de la mesa
 		glTranslatef(3.1, 0.0, 0.0);
+		glRotatef(rotS, 0.0, 1.0, 0.0);
 		//glTranslatef(0.0 + trax, 0.0 + tray, 0.0 + traz);
 		//PATAS
 		float xx = 2.4;
@@ -498,13 +503,16 @@ void createSillas() {
 		glTranslatef(-3.65, 0.0, -1.3);
 		glPushMatrix();
 			//Rotacion de una silla
-			cSilla();
+			cSilla(0.0);
 			glRotatef(90.0, 0.0, 1.0, 0.0);
-			cSilla();
+			cSilla(0.0);
 			glRotatef(90.0, 0.0, 1.0, 0.0);
-			cSilla();
-			glRotatef(90.0, 0.0, 1.0, 0.0);
-			cSilla();
+			cSilla(0.0);
+			glPushMatrix();
+				glTranslatef(0.0, 0.0, 0.0 + transSilla);
+				glRotatef(90.0, 0.0, 1.0, 0.0);
+				cSilla(rotSilla);
+			glPopMatrix();
 		glPopMatrix();
 	glPopMatrix();
 }
@@ -709,13 +717,13 @@ void display(void)   // Creamos la funcion donde se dibuja
 		createCuarto();
 		createPuerta();
 		createVentana();
-		//createMuebles();
-		//createChess();
+		createMuebles();
+		createChess();
 		//Sin esto, se queda el color del material del estante? why???
 		glDisable(GL_LIGHTING);
 		glDisable(GL_COLOR_MATERIAL);
-		//createMesa();
-		//createSillas();
+		createMesa();
+		createSillas();
 
 		
 	glPopMatrix();	//General
@@ -781,6 +789,47 @@ void animacion()
 				rotVentana -= 2.0;
 				if (rotVentana == 0.0)
 					banderaVentana = false;
+			}
+		}
+		/*
+			Basicamente, si banderaSilla es true, se presionó la tecla 5. Como Z = 0.0:
+			Primero se mueve en -z hasta -2.0, luego rota hasta -90.0 y pone banderaSilla en false
+
+			Si banderaSilla vuelve a ser true, ahora como Z = -2.0:
+			Primero rota hasta 0.0, luego se mueve en Z hasta 0.0
+		*/
+		if (banderaSilla == true) {
+			if (banderaTrans == true) {
+				transSilla -= 0.1;
+				printf("z = %f\n", transSilla);
+				if (transSilla <= -2.0) {
+					transSilla = -2.0f;
+					banderaUpDown = true;
+				}
+				if (banderaUpDown == true) {	//Va de 0 a 90
+					rotSilla -= 2.0;
+					if (rotSilla <= -90.0) {
+						rotSilla = -90.0;
+						banderaSilla = false;
+					}
+
+				}
+			}
+			else {
+
+				rotSilla += 2.0;
+				if (rotSilla >= 0.0) {
+					rotSilla = 2.0;
+					banderaUpDown = false;
+				}
+				if (banderaUpDown == false) {
+					transSilla += 0.1;
+					printf("z = %f\n", transSilla);
+					if (transSilla >= 0.0) {
+						transSilla = 0.0f;
+						banderaSilla = false;
+					}
+				}
 			}
 		}
 		dwLastUpdateTime = dwCurrentTime;
@@ -988,14 +1037,21 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 			}
 			break;
 		case '5':
+			if (banderaSilla == false) {
+				banderaSilla = true;
+				if (transSilla == 0.0)	//Va de 0 a -2.0
+					banderaTrans = true;	//Va de 0 a 90
+				else
+					banderaTrans = false;
+			}
 			break;
 		case '6':
-			rotSillon += 1.0;
-			printf("rot = %f\n", rotSillon);
+			rotSilla += 2.0;
+			printf("rot = %f\n", rotSilla);
 			break;
 		case '7':
-			rotSillon -= 1.0;
-			printf("rot = %f\n", rotSillon);
+			rotSilla -= 2.0;
+			printf("rot = %f\n", rotSilla);
 			break;
 		case 'j':
 			trax += 0.1;
