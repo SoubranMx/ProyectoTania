@@ -711,7 +711,7 @@ void CFiguras::mesa(GLuint text, float f, float lx, float ly) {
 	glEnd();
 }
 
-void CFiguras::cuarto(GLuint pared1, GLuint pared2, GLuint piso, float normal) {
+void CFiguras::cuarto(GLuint pared1, GLuint pared2, GLuint piso, GLuint techo, float normal) {
 	GLfloat vertice[22][3] = {
 				{0.5 ,-0.5, 0.5},    //Coordenadas Vértice 0 V0
 				{-0.5 ,-0.5, 0.5},   //Coordenadas Vértice 1 V1
@@ -809,6 +809,7 @@ void CFiguras::cuarto(GLuint pared1, GLuint pared2, GLuint piso, float normal) {
 		glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[2]);
 	glEnd();
 
+	glBindTexture(GL_TEXTURE_2D, techo);
 	glBegin(GL_POLYGON);  //Top
 		glNormal3f(0.0f, normal, 0.0f);
 		glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertice[4]);

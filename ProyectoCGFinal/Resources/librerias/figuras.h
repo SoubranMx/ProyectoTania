@@ -29,7 +29,7 @@ class CFiguras
 	void piso(GLuint text);
 	void mesa(GLuint text, float f, float lx, float ly);
 	void silla(GLuint text, float f, float lx, float ly);
-	void cuarto(GLuint pared1, GLuint pared2, GLuint piso, float normal);
+	void cuarto(GLuint pared1, GLuint pared2, GLuint piso, GLuint techo, float normal);
 	void puerta(GLuint text);
 	void ventana(GLuint text, float textX, float textY);
 };

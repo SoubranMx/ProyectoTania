@@ -58,6 +58,7 @@ CTexture t_door;
 CTexture t_mesa;
 CTexture t_silla;
 CTexture t_ventana;
+CTexture t_techo;
 //END TEXTURAS
 
 // MODELOS
@@ -158,6 +159,87 @@ float pos_xJ, pos_yJ, pos_zJ, view_xJ, view_yJ, view_zJ, up_xJ, up_yJ, up_zJ;
 float lookUpDownJ;
 //END CAMARA
 
+
+//	************* KEY FRAMES	************* //
+float pBz = 0.0, pCx = 0.0, pCz = 0.0, pDx = 0.0, pDz = 0.0, pFx = 0.0, pFy = 0.0, pFz = 0.0, pGz = 0.0;
+#define MAX_FRAMES 15		//15 keyframes
+int i_max_steps = 90;		//Cantidad de cuadros intermedios	valores peque�os: animacion r�pida, valores grandes: animaci�n m�s pausada
+int i_curr_steps = 0;
+
+typedef struct _frame {
+	//Variables para guardar KeyFrames
+	float pBz;
+	float pCx;
+	float pCz;
+	float pDx;
+	float pDz;
+	float pFx;
+	float pFy;
+	float pFz;
+	float pGz;
+
+	//Incrementos
+	float pBzInc;
+	float pCxInc;
+	float pCzInc;
+	float pDxInc;
+	float pDzInc;
+	float pFxInc;
+	float pFyInc;
+	float pFzInc;
+	float pGzInc;
+} FRAME;
+FRAME KeyFrame[MAX_FRAMES];
+int FrameIndex = 0;			//introducir datos
+bool play = false;
+int playIndex = 0;
+int w = 500, h = 500;
+int frame = 0, time, timebase = 0;
+char s[30];
+//	************* END KEY FRAMES	************* //
+//	*********************	KEYFRAMES ***************			
+
+void saveFrame(void) {
+	printf("frameindex %d\n", FrameIndex);
+	KeyFrame[FrameIndex].pBz = pBz;
+	KeyFrame[FrameIndex].pCx = pCx;
+	KeyFrame[FrameIndex].pCz = pCz;
+	KeyFrame[FrameIndex].pDx = pDx;
+	KeyFrame[FrameIndex].pDz = pDz;
+	KeyFrame[FrameIndex].pFx = pFx;
+	KeyFrame[FrameIndex].pFy = pFy;
+	KeyFrame[FrameIndex].pFz = pFz;
+	KeyFrame[FrameIndex].pGz = pGz;
+
+	FrameIndex++;
+}
+void resetElements(void)
+{
+	pBz = KeyFrame[0].pBz;
+	pCx = KeyFrame[0].pCx;
+	pCz = KeyFrame[0].pCz;
+	pDx = KeyFrame[0].pDx;
+	pDz = KeyFrame[0].pDz;
+	pFx = KeyFrame[0].pFx;
+	pFy = KeyFrame[0].pFy;
+	pFz = KeyFrame[0].pFz;
+	pGz = KeyFrame[0].pGz;
+}
+void interpolation(void)
+{
+	//Los incrementos
+	KeyFrame[playIndex].pBzInc = (KeyFrame[playIndex + 1].pBz - KeyFrame[playIndex].pBz) / i_max_steps;
+	KeyFrame[playIndex].pCxInc = (KeyFrame[playIndex + 1].pCx - KeyFrame[playIndex].pCx) / i_max_steps;
+	KeyFrame[playIndex].pCzInc = (KeyFrame[playIndex + 1].pCz - KeyFrame[playIndex].pCz) / i_max_steps;
+	KeyFrame[playIndex].pDxInc = (KeyFrame[playIndex + 1].pDx - KeyFrame[playIndex].pDx) / i_max_steps;
+	KeyFrame[playIndex].pDzInc = (KeyFrame[playIndex + 1].pDz - KeyFrame[playIndex].pDz) / i_max_steps;
+	KeyFrame[playIndex].pFxInc = (KeyFrame[playIndex + 1].pFx - KeyFrame[playIndex].pFx) / i_max_steps;
+	KeyFrame[playIndex].pFyInc = (KeyFrame[playIndex + 1].pFy - KeyFrame[playIndex].pFy) / i_max_steps;
+	KeyFrame[playIndex].pFzInc = (KeyFrame[playIndex + 1].pFz - KeyFrame[playIndex].pFz) / i_max_steps;
+	KeyFrame[playIndex].pGzInc = (KeyFrame[playIndex + 1].pGz - KeyFrame[playIndex].pGz) / i_max_steps;
+}
+
+//	*************	KEY FRAMES	*********************
 void InitGL(GLvoid)     // Inicializamos parametros
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo	
@@ -222,6 +304,10 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	t_ventana.BuildGLTexture();
 	t_ventana.ReleaseImage();
 
+	t_techo.LoadTGA("Resources/Texturas/techo.tga");
+	t_techo.BuildGLTexture();
+	t_techo.ReleaseImage();
+
 //Carga de Figuras
 	sofa._3dsLoad("Resources/Modelos/sofa2.3DS");
 	//sofa.VertexNormals();
@@ -270,6 +356,194 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	up_yJ = 1.0;
 	up_zJ = 0.0;
 	lookUpDownJ = 73.0;
+
+	//	**************	KEY FRAMES	**************
+	for (int i = 0; i < MAX_FRAMES; i++)
+	{
+		KeyFrame[i].pBz = 0;
+		KeyFrame[i].pCx = 0;
+		KeyFrame[i].pCz = 0;
+		KeyFrame[i].pDx = 0;
+		KeyFrame[i].pDz = 0;
+		KeyFrame[i].pFx = 0;
+		KeyFrame[i].pFy = 0;
+		KeyFrame[i].pFz = 0;
+		KeyFrame[i].pGz = 0;
+
+		KeyFrame[i].pBzInc = 0;
+		KeyFrame[i].pCxInc = 0;
+		KeyFrame[i].pCzInc = 0;
+		KeyFrame[i].pDxInc = 0;
+		KeyFrame[i].pDzInc = 0;
+		KeyFrame[i].pFxInc = 0;
+		KeyFrame[i].pFyInc = 0;
+		KeyFrame[i].pFzInc = 0;
+		KeyFrame[i].pGzInc = 0;
+	}
+	
+	// Frame 0
+		KeyFrame[0].pBz = 0;
+		KeyFrame[0].pCx = 0;
+		KeyFrame[0].pCz = 0;
+		KeyFrame[0].pDx = 0;
+		KeyFrame[0].pDz = 0;
+		KeyFrame[0].pFx = 0;
+		KeyFrame[0].pFy = 0;
+		KeyFrame[0].pFz = 0;
+		KeyFrame[0].pGz = 0;
+
+		KeyFrame[0].pBzInc = -0.05;
+		KeyFrame[0].pCxInc = 0;
+		KeyFrame[0].pCzInc = 0;
+		KeyFrame[0].pDxInc = 0;
+		KeyFrame[0].pDzInc = 0;
+		KeyFrame[0].pFxInc = 0;
+		KeyFrame[0].pFyInc = 0;
+		KeyFrame[0].pFzInc = 0;
+		KeyFrame[0].pGzInc = 0;
+	// Frame 1
+		KeyFrame[1].pBz = -4.5;
+		KeyFrame[1].pCx = 0;
+		KeyFrame[1].pCz = 0;
+		KeyFrame[1].pDx = 0;
+		KeyFrame[1].pDz = 0;
+		KeyFrame[1].pFx = 0;
+		KeyFrame[1].pFy = 0;
+		KeyFrame[1].pFz = 0;
+		KeyFrame[1].pGz = 0;
+
+		KeyFrame[1].pBzInc = 0;
+		KeyFrame[1].pCxInc = 0;
+		KeyFrame[1].pCzInc = 0;
+		KeyFrame[1].pDxInc = 0;
+		KeyFrame[1].pDzInc = 0;
+		KeyFrame[1].pFxInc = 0;
+		KeyFrame[1].pFyInc = 0;
+		KeyFrame[1].pFzInc = 0;
+		KeyFrame[1].pGzInc = 0.1;
+	// Frame 2
+		KeyFrame[2].pBz = -4.5;
+		KeyFrame[2].pCx = 0;
+		KeyFrame[2].pCz = 0;
+		KeyFrame[2].pDx = 0;
+		KeyFrame[2].pDz = 0;
+		KeyFrame[2].pFx = 0;
+		KeyFrame[2].pFy = 0;
+		KeyFrame[2].pFz = 0;
+		KeyFrame[2].pGz = 9.0;
+
+		KeyFrame[2].pBzInc = 0;
+		KeyFrame[2].pCxInc = -0.05;
+		KeyFrame[2].pCzInc = -0.05;
+		KeyFrame[2].pDxInc = 0;
+		KeyFrame[2].pDzInc = 0;
+		KeyFrame[2].pFxInc = 0;
+		KeyFrame[2].pFyInc = 0;
+		KeyFrame[2].pFzInc = 0;
+		KeyFrame[2].pGzInc = 0;
+	// Frame 3
+		KeyFrame[3].pBz = -4.5;
+		KeyFrame[3].pCx = -4.5;
+		KeyFrame[3].pCz = -4.5;
+		KeyFrame[3].pDx = 0;
+		KeyFrame[3].pDz = 0;
+		KeyFrame[3].pFx = 0;
+		KeyFrame[3].pFy = 0;
+		KeyFrame[3].pFz = 0;
+		KeyFrame[3].pGz = 9.0;
+
+		KeyFrame[3].pBzInc = 0;
+		KeyFrame[3].pCxInc = 0;
+		KeyFrame[3].pCzInc = 0;
+		KeyFrame[3].pDxInc = 0.05;
+		KeyFrame[3].pDzInc = 0.1;
+		KeyFrame[3].pFxInc = 0;
+		KeyFrame[3].pFyInc = 0;
+		KeyFrame[3].pFzInc = 0;
+		KeyFrame[3].pGzInc = 0;
+	// Frame 4
+		KeyFrame[4].pBz = -4.5;
+		KeyFrame[4].pCx = -4.5;
+		KeyFrame[4].pCz = -4.5;
+		KeyFrame[4].pDx = 4.5;
+		KeyFrame[4].pDz = 9.0;
+		KeyFrame[4].pFx = 0;
+		KeyFrame[4].pFy = 0;
+		KeyFrame[4].pFz = 0;
+		KeyFrame[4].pGz = 9.0;
+
+		KeyFrame[4].pBzInc = 0;
+		KeyFrame[4].pCxInc = 0.25;
+		KeyFrame[4].pCzInc = -0.25;
+		KeyFrame[4].pDxInc = 0;
+		KeyFrame[4].pDzInc = 0;
+		KeyFrame[4].pFxInc = 0;
+		KeyFrame[4].pFyInc = 0;
+		KeyFrame[4].pFzInc = 0;
+		KeyFrame[4].pGzInc = 0;
+	// Frame 5
+		KeyFrame[5].pBz = -4.5;
+		KeyFrame[5].pCx = 18.0;
+		KeyFrame[5].pCz = -27.0;
+		KeyFrame[5].pDx = 4.5;
+		KeyFrame[5].pDz = 9.0;
+		KeyFrame[5].pFx = 0;
+		KeyFrame[5].pFy = 0;
+		KeyFrame[5].pFz = 0;
+		KeyFrame[5].pGz = 9.0;
+
+		KeyFrame[5].pBzInc = 0;
+		KeyFrame[5].pCxInc = 0;
+		KeyFrame[5].pCzInc = 0;
+		KeyFrame[5].pDxInc = 0;
+		KeyFrame[5].pDzInc = 0;
+		KeyFrame[5].pFxInc = 0.005556;
+		KeyFrame[5].pFyInc = 0.066667;
+		KeyFrame[5].pFzInc = 0.005556;
+		KeyFrame[5].pGzInc = 0;
+
+	// Frame 6
+		KeyFrame[6].pBz = -4.5;
+		KeyFrame[6].pCx = 18.0;
+		KeyFrame[6].pCz = -27.0;
+		KeyFrame[6].pDx = 4.5;
+		KeyFrame[6].pDz = 9.0;
+		KeyFrame[6].pFx = 0.5;
+		KeyFrame[6].pFy = 6.0;
+		KeyFrame[6].pFz = 0.5;
+		KeyFrame[6].pGz = 9.0;
+
+		KeyFrame[6].pBzInc = 0;
+		KeyFrame[6].pCxInc = 0;
+		KeyFrame[6].pCzInc = 0;
+		KeyFrame[6].pDxInc = 0;
+		KeyFrame[6].pDzInc = 0;
+		KeyFrame[6].pFxInc = -0.094444;
+		KeyFrame[6].pFyInc = -0.077778;
+		KeyFrame[6].pFzInc = -0.094444;
+		KeyFrame[6].pGzInc = 0;
+	// Frame 7
+		KeyFrame[7].pBz = -4.5;
+		KeyFrame[7].pCx = 18.0;
+		KeyFrame[7].pCz = -27.0;
+		KeyFrame[7].pDx = 4.5;
+		KeyFrame[7].pDz = 9.0;
+		KeyFrame[7].pFx = -8.0;
+		KeyFrame[7].pFy = -1.0;
+		KeyFrame[7].pFz = -8.0;
+		KeyFrame[7].pGz = 9.0;
+
+		KeyFrame[7].pBzInc = 0;
+		KeyFrame[7].pCxInc = 0;
+		KeyFrame[7].pCzInc = 0;
+		KeyFrame[7].pDxInc = 0;
+		KeyFrame[7].pDzInc = 0;
+		KeyFrame[7].pFxInc = 0;
+		KeyFrame[7].pFyInc = 0;
+		KeyFrame[7].pFzInc = 0;
+		KeyFrame[7].pGzInc = 0;
+		
+		FrameIndex = 8;
 }
 
 void pintaTexto(float x, float y, float z, void* font, char* string)
@@ -362,14 +636,14 @@ void createCuarto() {
 		glTranslatef(0.0, 9.15, -1.0);
 		glScalef(18.0, 18.0, 18.0);
 		glDisable(GL_LIGHTING);
-		cuarto.cuarto(t_pared1.GLindex, t_pared2.GLindex, t_pisoM.GLindex, 1.0);
+		cuarto.cuarto(t_pared1.GLindex, t_pared2.GLindex, t_pisoM.GLindex, t_techo.GLindex, 1.0);
 		glEnable(GL_LIGHTING);
 	glPopMatrix();
 	glPushMatrix();
 		glTranslatef(0.0, 9.195, -1.0);
 		glScalef(18.1, 18.1, 18.1);
 		glDisable(GL_LIGHTING);
-		cuarto.cuarto(t_wall.GLindex, t_wall.GLindex, t_wall.GLindex, -1.0);
+		cuarto.cuarto(t_wall.GLindex, t_wall.GLindex, t_wall.GLindex, t_wall.GLindex, -1.0);
 		glEnable(GL_LIGHTING);
 	glPopMatrix();
 }
@@ -521,8 +795,40 @@ void peonBl() {
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 0.0);
 		bPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(4.5, 0.0, 0.0+pBz);
+		bPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(9.0, 0.0, 0.0);
+		bPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(13.5, 0.0, 0.0);
+		bPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(18.0, 0.0, 0.0);
+		bPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(22.5, 0.0, 0.0);
+		bPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(27.0, 0.0, 0.0);
+		bPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(31.5, 0.0, 0.0);
+		bPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	/*glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.0);
+		bPeon.GLrender(NULL, _SHADED, 1.0);
 		glPushMatrix();
-			glTranslatef(4.5, 0.0, 0.0);
+			glTranslatef(4.5+trax, 0.0, 0.0+traz);
 			bPeon.GLrender(NULL, _SHADED, 1.0);
 			glPushMatrix();
 				glTranslatef(4.5, 0.0, 0.0);
@@ -549,7 +855,7 @@ void peonBl() {
 				glPopMatrix();
 			glPopMatrix();
 		glPopMatrix();
-	glPopMatrix();
+	glPopMatrix();*/
 
 	/*for (int i = 0; i <= 7; i++) {
 		bPeon.GLrender(NULL, _SHADED, 1.0);
@@ -559,6 +865,38 @@ void peonBl() {
 
 void peonNe() {
 	glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.0 + pGz);
+		nPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(-4.5+pFx, 0.0+pFy, 0.0 + pFz);
+		nPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(-9.0, 0.0, 0.0);
+		nPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(-13.5, 0.0, 0.0);
+		nPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(-18.0, 0.0, 0.0);
+		nPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(-22.5, 0.0, 0.0);
+		nPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(-27.0, 0.0, 0.0);
+		nPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(-31.5, 0.0, 0.0);
+		nPeon.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+	/*glPushMatrix();
 		glTranslatef(0.0, 0.0, 0.0);
 		nPeon.GLrender(NULL, _SHADED, 1.0);
 		glPushMatrix();
@@ -589,7 +927,7 @@ void peonNe() {
 				glPopMatrix();
 			glPopMatrix();
 		glPopMatrix();
-	glPopMatrix();
+	glPopMatrix();*/
 
 	/*for (int i = 0; i <= 7; i++) {
 		bPeon.GLrender(NULL, _SHADED, 1.0);
@@ -601,32 +939,32 @@ void caballoBl() {
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 0.0);
 		bCaballo.GLrender(NULL, _SHADED, 1.0);
-		glPushMatrix();
-			glTranslatef(22.5, 0.0, 0.0);
-			bCaballo.GLrender(NULL, _SHADED, 1.0);
-		glPopMatrix();
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(22.5, 0.0, 0.0);
+		bCaballo.GLrender(NULL, _SHADED, 1.0);
 	glPopMatrix();
 }
 
 void caballoNe() {
 	glPushMatrix();
-		glTranslatef(0.0, 0.0, 0.0);
+		glTranslatef(0.0 + pDx, 0.0, 0.0 + pDz);
 		nCaballo.GLrender(NULL, _SHADED, 1.0);
-		glPushMatrix();
-			glTranslatef(22.5, 0.0, 0.0);
-			nCaballo.GLrender(NULL, _SHADED, 1.0);
-		glPopMatrix();
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(22.5, 0.0, 0.0);
+		nCaballo.GLrender(NULL, _SHADED, 1.0);
 	glPopMatrix();
 }
 
 void alfilBl() {
 	glPushMatrix();
-		glTranslatef(0.0, 0.0, 0.0);
+		glTranslatef(0.0 +pCx , 0.0, 0.0 + pCz);	/////////////////////////
 		bAlfil.GLrender(NULL, _SHADED, 1.0);
-		glPushMatrix();
-			glTranslatef(13.5, 0.0, 0.0);
-			bAlfil.GLrender(NULL, _SHADED, 1.0);
-		glPopMatrix();
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(13.5, 0.0, 0.0);
+		bAlfil.GLrender(NULL, _SHADED, 1.0);
 	glPopMatrix();
 }
 
@@ -634,10 +972,10 @@ void alfilNe() {
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, 0.0);
 		nAlfil.GLrender(NULL, _SHADED, 1.0);
-		glPushMatrix();
-			glTranslatef(13.5, 0.0, 0.0);
-			nAlfil.GLrender(NULL, _SHADED, 1.0);
-		glPopMatrix();
+	glPopMatrix();
+	glPushMatrix();
+		glTranslatef(13.5, 0.0, 0.0);
+		nAlfil.GLrender(NULL, _SHADED, 1.0);
 	glPopMatrix();
 }
 
@@ -801,7 +1139,6 @@ void animacion()
 		if (banderaSilla == true) {
 			if (banderaTrans == true) {
 				transSilla -= 0.1;
-				printf("z = %f\n", transSilla);
 				if (transSilla <= -2.0) {
 					transSilla = -2.0f;
 					banderaUpDown = true;
@@ -824,7 +1161,6 @@ void animacion()
 				}
 				if (banderaUpDown == false) {
 					transSilla += 0.1;
-					printf("z = %f\n", transSilla);
 					if (transSilla >= 0.0) {
 						transSilla = 0.0f;
 						banderaSilla = false;
@@ -838,6 +1174,44 @@ void animacion()
 	{
 		
 		dwLastUpdateTime = dwCurrentTime;
+	}
+
+	if (play)
+	{
+
+		if (i_curr_steps >= i_max_steps) //end of animation between frames?
+		{
+			playIndex++;
+			if (playIndex > FrameIndex - 2)	//end of total animation?
+			{
+				printf("termina anim\n");
+				playIndex = 0;
+				play = false;
+			}
+			else //Next frame interpolations
+			{
+				i_curr_steps = 0; //Reset counter
+				//Interpolation
+				interpolation();
+
+			}
+		}
+		else
+		{
+			//Draw animation
+			pBz += KeyFrame[playIndex].pBzInc;
+			pCx += KeyFrame[playIndex].pCxInc;
+			pCz += KeyFrame[playIndex].pCzInc;
+			pDx += KeyFrame[playIndex].pDxInc;
+			pDz += KeyFrame[playIndex].pDzInc;
+			pFx += KeyFrame[playIndex].pFxInc;
+			pFy += KeyFrame[playIndex].pFyInc;
+			pFz += KeyFrame[playIndex].pFzInc;
+			pGz += KeyFrame[playIndex].pGzInc;
+
+			i_curr_steps++;
+		}
+
 	}
 
 	glutPostRedisplay();
@@ -887,7 +1261,7 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 			objCamera.Strafe_Camera(CAMERASPEED + 0.4);
 			break;
 
-		case ' ':		//Poner algo en movimiento
+		/*case ' ':		//Poner algo en movimiento
 			//Commit?
 			printf("mPos.x = %f\tmPos.y = %f\tmPos.z = %f\n",objCamera.mPos.x, objCamera.mPos.y, objCamera.mPos.z);
 			printf("mView.x = %f\tmView.y = %f\tmView.z = %f\n", objCamera.mView.x, objCamera.mView.y, objCamera.mView.z);
@@ -896,7 +1270,7 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 			printf("CAMERASPEED: %f\n", CAMERASPEED);
 			printf("******************************************\n");
 
-			break;
+			break;*/
 		case '0':	//Original
 			banderaCO = true;	//Estamos en camara original
 			//Posiciona la camara a la posición original. Si viene de cualquier otra cámara, no debe borrar los anteriores estados.
@@ -1045,15 +1419,15 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 					banderaTrans = false;
 			}
 			break;
-		case '6':
+		/*case '6':
 			rotSilla += 2.0;
 			printf("rot = %f\n", rotSilla);
 			break;
 		case '7':
 			rotSilla -= 2.0;
 			printf("rot = %f\n", rotSilla);
-			break;
-		case 'j':
+			break;*/
+		/*case 'j':
 			trax += 0.1;
 			printf("x = %f\ty = %f\tz = %f\n", trax,tray,traz);
 			break;
@@ -1100,7 +1474,88 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 		case 'M':
 			scaleZ -= 0.01;
 			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
+			break;*/
+
+		/*case ' ':	//Salvar Frame
+			if (FrameIndex < MAX_FRAMES)
+			{
+				saveFrame();
+			}
+
+			break;*/
+		case '6':
+			if (play == false && (FrameIndex > 1))
+			{
+
+				resetElements();
+				//First Interpolation
+				interpolation();
+
+				play = true;
+				playIndex = 0;
+				i_curr_steps = 0;
+			}
+			else
+			{
+				play = false;
+			}
 			break;
+
+		/*case '.':
+			for (int i = 0; i < FrameIndex; i++) {
+				printf("Frame [%d]\n", i);
+				printf("pBz = %f  pCx = %f  pCz = %f  pDx = %f  pDz = %f\n", KeyFrame[i].pBz, KeyFrame[i].pCx, KeyFrame[i].pCz, KeyFrame[i].pDx, KeyFrame[i].pDz);
+				printf("pFx = %f  pFy = %f  pFz = %f  pGz = %f\n", KeyFrame[i].pFz, KeyFrame[i].pFy, KeyFrame[i].pFz, KeyFrame[i].pGz);
+
+				printf("\nIncrementos:\n\n");
+				printf("pBzInc = %f  pCxInc = %f  pCzInc = %f  pDxInc = %f  pDzInc = %f\n", KeyFrame[i].pBzInc, KeyFrame[i].pCxInc, KeyFrame[i].pCzInc, KeyFrame[i].pDxInc, KeyFrame[i].pDzInc);
+				printf("pFxInc = %f  pFyInc = %f  pFzInc = %f  pGzInc = %f\n", KeyFrame[i].pFzInc, KeyFrame[i].pFyInc, KeyFrame[i].pFzInc, KeyFrame[i].pGzInc);
+				printf("******************************************\n\n");
+			}
+			break;*/
+//Casos utilizados para mover las fichas de Ajedrez
+		/*case 'g':
+			pBz -= 0.5;
+			break;
+		case 'h':
+			pGz += 0.5;
+			break;
+		case 'j':
+			pCx += 0.5;
+			break;
+		case 'J':
+			pCx -= 0.5;
+			break;
+		case 'k':
+			pCz += 0.5;
+			break;
+		case 'K':
+			pCz -= 0.5;
+			break;
+		case 'i':
+			pDx += 0.5;
+			break;
+		case 'I':
+			pDz += 0.5;
+			break;
+		case 'l':
+			pFx += 0.5;
+			break;
+		case 'L':
+			pFx -= 0.5;
+			break;
+		case 'p':
+			pFz += 0.5;
+			break;
+		case 'P':
+			pFz -= 0.5;
+			break;
+		case 'o':
+			pFy += 0.5;
+			break;
+		case 'O':
+			pFy -= 0.5;
+			break;*/
 		case 27:        // Cuando Esc es presionado...
 			exit(0);   // Salimos del programa
 			break;
