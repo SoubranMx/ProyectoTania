@@ -1363,7 +1363,7 @@ void foc1() {
 	glPushMatrix();
 		glTranslatef(-0.4, 13.6, 17.2);		//En el techo mismo
 		//glTranslatef(-0.4 + trax, 13.6 + tray, 17.2 + traz);
-		glutSolidSphere(0.1, 10, 10);	//Representa el foco, solo para prueba
+		//glutSolidSphere(0.1, 10, 10);	//Representa el foco, solo para prueba
 
 		if (foco1) {
 			glEnable(GL_LIGHT1);
@@ -1382,7 +1382,7 @@ void foc2() {
 	glPushMatrix();
 		//glTranslatef(0.0 + trax, 0.0 + tray, 0.0 + traz);
 		glTranslatef(-5.0, 9.1, -0.1);
-		glutSolidSphere(0.1, 10, 10);
+		//glutSolidSphere(0.1, 10, 10);
 		//glRotatef(angleX2, 1.0f, 0.0f, 0.0f);
 		//glRotatef(angleY2, 0.0f, 1.0f, 0.0f);
 		glRotatef(-66.0, 1.0f, 0.0f, 0.0f);
@@ -1408,7 +1408,7 @@ void foc3() {
 	glPushMatrix();
 		glTranslatef(-1.0, 17.4, 0.0);		//En el techo mismo
 		//glTranslatef(-1.0 + trax, 17.4 + tray, 0.0 + traz);
-		glutSolidSphere(0.1, 10, 10);	//Representa el foco, solo para prueba
+		//glutSolidSphere(0.1, 10, 10);	//Representa el foco, solo para prueba
 		
 		if (foco3) {
 			glEnable(GL_LIGHT3);
