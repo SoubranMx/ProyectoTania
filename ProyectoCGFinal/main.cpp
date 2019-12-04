@@ -31,23 +31,191 @@ CCamera objCamera;
 GLfloat g_lookupdown = 16.0f;    // Look Position In The Z-Axis (NEW) 
 
 int font = (int)GLUT_BITMAP_HELVETICA_18;
-
-GLfloat Diffuse[] = { 0.5f, 0.5f, 0.5f, 1.0f };				// Diffuse Light Values
+/*/
+GLfloat Diffuse[] = { 0.5f, 0.5f, 0.95, 1.0f };				// Diffuse Light Values
 GLfloat Specular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
 GLfloat Position[] = { 0.0f, 27.0f, -5.0f, 0.0f };			// Light Position
 GLfloat Position2[] = { 0.0f, 0.0f, -5.0f, 1.0f };			// Light Position
+*/
+/*
+	********** LUCES **********
+	https://docs.microsoft.com/en-us/windows/win32/opengl/gllightfv
+	https://www.cs.brandeis.edu/~cs155/OpenGL%20Lecture_05_6.pdf
 
-GLfloat m_dif1[] = { 0.0f, 0.2f, 1.0f, 1.0f };				// Diffuse Light Values
-GLfloat m_spec1[] = { 0.0, 0.0, 0.0, 1.0 };				// Specular Light Values
-GLfloat m_amb1[] = { 0.0, 0.0, 0.0, 1.0 };				// Ambiental Light Values
-GLfloat m_s1[] = { 18 };
+	Variables para el uso de Luces.
+	Por ejemplo:
+	Fuente de Luz Blanca	(para reflejar todo tipo de material y color correctamente)
+	GLfloat LightAmbient[]= { 1.0f, 1.0f, 1.0f, 1.0f }; 			// Ambient Light Values
+	GLfloat LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };				// Diffuse Light Values
+	GLfloat LightSpecular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
+
+	Posiciones de la Luz
+
+	LightPosition	si el valor w es 0.0, la Luz es tratada como luz direccional (lejana)
+	LightDirection	hacia donde se posiciona la luz
+
+	GLfloat LightPosition[]= { 0.0f, 0.0f, 0.0f, 1.0f };	luz normal
+	GLfloat LightPosition1[]= { 0.0f, 0.0f, 1.0f, 0.0f };	luz direccional
+
+	Luz Puntual o Luz Spotlight:
+	
+	Con el uso de glLightfv (GL_LIGHTx, DEFINITION, params);
+	Definiciones:
+	Para definir la luz:
+	GL_AMBIENT
+	GL_DIFFUSE
+	GL_SPECULAR
+
+	Para definir aspectos de la luz:
+	GL_POSITION		{x,y,z,w}	si w=0	Direccional
+	GL_SPOT_DIRECTION	{x,y,z}		especifica la dirección a la que se dirige el haz de luz (Solo con SPOTLIGHT)
+	GL_SPOT_EXPONENT	{?}	Teóricamente implica un valor entre 0 - 128 que dispersa o concentra la luz.
+	GL_SPOT_CUTOFF		valor flotante que indica si una luz es de tipo SPOTLIGHT (0-90) o PUNTUAL (180)	Default 180
+
+	Para atenuar:
+	La funcion de atenuacion se da como F(d) = 1/ (a + bd + cd^2)
+	Donde:
+	a = GL_CONSTANT_ATTENUATION
+	b = GL_LINEAR_ATTENUATION
+	c = GL_QUADRATIC_ATTENUATION
+	d = distancia computada
+
+	Por default: no atenuacion => a=1, b=0, c=0
+
+*/
+//Luz blanca
+GLfloat aten1[] = { 0.1 , 0.0, 0.0 };	//Atenuacion de Luz Puntual
+GLfloat aten2[] = { 0.5 , 0.0, 0.0 };	//Atenuacion de Luz Spotlight
+GLfloat atenTecho[] = { 0.1 , 0.0, 0.0 };	//Atenuacion de Luz Spotlight
+
+GLfloat exponent[] = { 128.0, 0.0, 0.0 };
 
 
-//TEXTURAS
-//CTexture t_pasto;
+GLfloat LightAmbient[] = { 1.0f, 1.0f, 1.0f, 1.0f }; 			// Ambient Light Values
+GLfloat LightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };			// Diffuse Light Values
+GLfloat LightSpecular[] = { 1.0, 1.0, 1.0, 1.0f };				// Specular Light Values
+
+GLfloat LightPosition1[] = { 0.0f, 0.0f, 0.0f, 1.0f };			// Light Position
+GLfloat LightPosition2[] = { 0.0f, 0.0f, 0.0f, 1.0f };			// Light Position
+GLfloat LightPosition3[] = { 0.0f, 0.0f, 0.0f, 1.0f };			// Light Position
+
+GLfloat LightDirection1[] = { 0.0f, 0.0f, -1.0f };			// Light Position
+GLfloat LightDirection2[] = { 0.0f, 0.0f, -1.0f };			// Light Position
+GLfloat LightDirection3[] = { 0.0f, 0.0f, -1.0f };			// Light Position
+
+float LightAngle = 36.0f;
+
+bool light = false;		// Luz ON/OFF
+bool foco1 = false;
+bool foco2 = false;
+bool foco3 = false;
+
+float angleX1 = 0.0;
+float angleY1 = 0.0;
+float angleX2 = 0.0;
+float angleY2 = 0.0;
+float angleX3 = 0.0;
+float angleY3 = 0.0;
+
+static int spin = 0;
+
+/*
+	********** MATERIALES **********
+
+	Variables para el uso de materiales
+	
+	GLfloat mat_ambient[] = { 0.0, 0.0, 0.0, 1.0 };					// Color background, las caras menos iluminadas tenderan a ser oscuras con 0,0,0,1
+	GLfloat mat_diffuse[] = { 0.0, 1.0, 0.0, 1.0 };					// Object Color main
+	GLfloat mat_specular[] = { 0.0, 0.0, 1.0, 1.0 };				// Specular color
+	GLfloat mat_shininess[] = { 10.0 };								// Mayor = mas concentrado, menor = mas disperso  MIN = 1 => brillo sobre toda la superficie.
+	
+	En cuanto la luz se activa, glColor ya no es utilizado, en cambio se utilizan los materiales.
+	GL_FRONT hace referencia a la direccion de la normal. (glNormal3f)
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+*/
+typedef struct material
+{
+	GLfloat Ka[4];
+	GLfloat Kd[4];
+	GLfloat Ks[4];
+	GLfloat n[1];
+}materialStruct;
+
+void set_material(materialStruct mat) {
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat.Ka);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat.Kd);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat.Ks);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat.n);
+};
+// Algunos materiales	http://www.it.hiof.no/~borres/j3d/explain/light/p-materials.html
+
+//Laton
+materialStruct brass{
+	{0.33, 0.22, 0.03, 1.0},	//Ka
+	{0.78, 0.57, 0.11, 1.0},	//Kd
+	{0.99, 0.91, 0.81, 1.0},	//Ks
+	{27.8}						//n
+};
+
+materialStruct bronze{
+	{0.2125, 0.1275, 0.054, 1.0},	//Ka
+	{0.714, 0.4284, 0.18144, 1.0},	//Kd
+	{0.3935, 0.272, 0.1667, 1.0},	//Ks
+	{25.6}
+};
+
+materialStruct chrome{
+	{0.25, 0.25, 0.25, 1.0},	//Ka
+	{0.4, 0.4, 0.4, 1.0},	//Kd
+	{0.7746, 0.7746, 0.7746, 1.0},	//Ks
+	{76.8},
+};
+
+materialStruct polishedCopper{
+	{0.2295, 0.08825, 0.0275, 1.0},	//Ka
+	{0.5508, 0.2118, 0.066, 1.0},	//Kd
+	{0.5806, 0.223257, 0.0695701, 1.0},	//Ks
+	{51.2}
+};
+
+materialStruct gold{
+	{0.24725, 0.1995, 0.0745, 1.0},	//Ka
+	{0.75164, 0.60648, 0.22648, 1.0},	//Kd
+	{0.628281, 0.555802, 0.366065, 1.0},	//Ks
+	{51.2}
+};
+
+materialStruct polishedSilver{
+	{0.23125, 0.23125, 0.23125, 1.0},	//Ka
+	{0.2775, 0.2775, 0.2775, 1.0},	//Kd
+	{0.773911, 0.773911, 0.773911, 1.0},	//Ks
+	{89.6},
+};
+
+materialStruct ruby{
+	{0.1745, 0.01175, 0.01175, 0.55},		//Ka
+	{0.6142, 0.04136, 0.04136, 0.55},		//Kd
+	{0.727811, 0.626959, 0.626959, 0.55},	//Ks
+	{76.8}
+};
+
+materialStruct perl{
+	{0.25, 0.20725, 0.20725, 0.922},		//Ka
+	{1.0, 0.829, 0.829, 0.922},		//Kd
+	{0.296648, 0.296648, 0.296648, 0.922},	//Ks
+	{11.264}
+};
+/*
+	********** TEXTURAS **********
+
+	Texturas utilizadas en el proyecto.
+		En Photoshop, no aparece TGA como export option, por tanto, => guardar como => cambiar extensión a Targa
+*/
 CTexture cielo;
-CFiguras fig1;
-CFiguras fig3;
 
 CTexture t_piso;
 CTexture t_pared1;
@@ -59,21 +227,20 @@ CTexture t_mesa;
 CTexture t_silla;
 CTexture t_ventana;
 CTexture t_techo;
-//END TEXTURAS
+CTexture t_dado;
 
-// MODELOS
+
 /*
-	Modelos a tener en cuenta:
-	Sofa
-	TV
-	Mueble TV
-	Anaquel
-	Foco Techo
-	Lámpara
+	********** MODELOS **********
 
-	Arcade?
-	Luces?
+	Modelos utilizados en el proyecto, tanto manuales como importados de 3DS Max
+		Para usar Max, se exporta como 3DS.
+		Para exportar solo una selección: export selected
 */
+// Usadas para el skybox y pintar texto en pantalla
+CFiguras fig1;
+CFiguras fig3;
+
 //Figuras a "mano"
 CFiguras pisoGeneral;
 CFiguras silla;
@@ -88,7 +255,7 @@ CModel tv;
 CModel librero;
 CModel foco;
 CModel lampara;
-CModel arcade;
+CModel lamparaCalle;
 
 CModel chess;
 
@@ -105,29 +272,56 @@ CModel nTorre;
 CModel nAlfil;
 CModel nRey;
 CModel nReina;
-//END MODELOS
 
-//Auxiliares para dejar en su lugar cualquier cosa cuando la mueves con kli
-float  Lx = 0.0;
-float  Ly = 0.0;
-float  Lz = 0.0;
-//float aux = 0.0;
-//glTranslatef(3.8, 4.5, 9.0);
-//Mover posiciones
+/*
+	********** Mover posiciones **********
+
+	Utilizadas para trasladar objetos en tiempo de ejecución.
+	Por ejemplo: glTranslatef(0.0 + trax, 0.0 + tray, 0.0 + traz);
+*/
 float trax = 0.0;
 float tray = 0.0;
 float traz = 0.0;
-//Mover texturas
+
+float ranX = 0.0;
+float ranY = 0.0;
+float ranZ = 0.0;
+
+/*
+	********** Mover texturas **********
+
+	Utilizadas para mover las texturas de un objeto en tiempo de ejecución.
+*/
 float textX = 0.0;
 float textY = 0.0;
-float rotSillon = 0.0;
 
-//Mover escalas
+/*
+	********** Mover escalas **********
+
+	Utilizadas para escalar en ejecución algún objeto al que se le agreguen estas escalas
+	por ejemplo: glScalef(1.0 + scaleX, 1.0 + scaleY, 1.0 + scaleZ);
+	Para mover las escalas, se utilizan teclas asignadas
+*/
 float scaleX = 0.0;
 float scaleY = 0.0;
 float scaleZ = 0.0;
-// BANDERAS
-bool banderaCG = false;	//para mostrar las PC, son pesadas.
+float sc = 1.0;
+
+/*
+	********** BANDERAS **********
+
+	Se utiliza para saber en qué cámara se supone que esta el visualizador.
+	*banderaCJ	Camara Juego
+	*banderaCC	Camara Cuarto
+	*banderaCO	Camara Original
+
+	Se utilizan para saber si alguna tecla de animación fue presionada
+	*banderaPuerta	se activa la animación de abrir/cerrar puerta
+	*banderaVentana	abrir/cerrar ventana
+	*banderaSilla	inicia animación de movimiento de silla con rotación y de vuelta al punto origen
+	*banderaUpDown	para saber si: abre o cierra (puerta, ventana), desplaza o gira (silla)
+	*banderaTrans	para saber si la silla está en movimiento translate o rotación.
+*/
 bool banderaCJ = false;	//Visualización de Camara enfocada en el Juego
 bool banderaCC = false;	//Visualización de Camara enfocada en el cuarto
 bool banderaCO = false;	//Visualización de Camara original
@@ -136,31 +330,72 @@ bool banderaVentana = false;
 bool banderaSilla = false;
 bool banderaUpDown = false;
 bool banderaTrans = true;
-// END BANDERAS
+bool banderaDado = false;
 
-//ANIMACION
+
+/*
+	********** ANIMACION **********
+
+	*rotPuerta se utiliza como global para hacer rotar la Puerta en el eje Y
+	*rotVentana para el eje X
+	*rotSilla para el eje Y
+	*transSilla para el desplazamiento (translatef) en Z de la silla
+	*rotSillon fue utilizada para rotar algun objeto mediante una tecla, en el proyecto final no tiene utilidad
+*/
 float rotPuerta = 0.0f;
 float rotVentana = 0.0f;
 float rotSilla = 0.0f;
 float transSilla = 0.0f;
-//END ANIMACION
+float rotDado = 0.0f;
 
-//CAMARA
-// C define posiciones de la cámara para la "1a camara" que enfoca el Cuarto general
-// J define posiciones de la cámara para la "2a cámara" que enfoca el juego.
-// Se guardan en estos valores para que al hacer cambio de vista, se quede donde estaba en el estado anterior.
-// Es decir, al cambiar de Cuarto->Juego, la cámara cambia a los valores de Camara de Juego, guardando los valores
-// de la Camara de Cuarto.
-// Cuando se cambie de Juego->Cuarto, la camara cambia a los valores de Camara de Cuarto.
-// Si los valores han sido cambiados anteriormente, la camara se dirigira a las posiciones previamente guardadas.
+float rotSillon = 0.0;
+
+/*
+	********** CAMARA **********
+
+	*C define posiciones de la cámara para la "1a camara" que enfoca el Cuarto general
+	*J define posiciones de la cámara para la "2a cámara" que enfoca el juego.
+
+	*Se guardan en estos valores para que al hacer cambio de vista, se quede donde estaba en el estado anterior.
+	*Es decir, al cambiar de Cuarto->Juego, la cámara cambia a los valores de Camara de Juego, guardando los valores
+	 de la Camara de Cuarto.
+	*Cuando se cambie de Juego->Cuarto, la camara cambia a los valores de Camara de Cuarto.
+	*Si los valores han sido cambiados anteriormente, la camara se dirigira a las posiciones previamente guardadas.
+*/
+
 float pos_xC, pos_yC, pos_zC, view_xC, view_yC, view_zC, up_xC, up_yC, up_zC;
 float lookUpDownC;
 float pos_xJ, pos_yJ, pos_zJ, view_xJ, view_yJ, view_zJ, up_xJ, up_yJ, up_zJ;
 float lookUpDownJ;
-//END CAMARA
 
+/*
+	**********	KEY FRAMES	**********
 
-//	************* KEY FRAMES	************* //
+	Variables utilizadas para el uso de KeyFrames.
+	Como la animación por KeyFrames solo preveo 6 o 7 movimientos, solo utilizaré 7 piezas de ajedrez.
+	Algunas solo deben moverse hacia enfrente, como los peones. Otros, tanto en x como en z, y solo uno en las 3 posiciones para salir del tablero.
+	
+	*pBz	pieza B eje z
+	*pCx	pieza C eje x
+	*pFy	pieza F eje y
+	*And so on...
+
+	*MAX_FRAMES indica el numero de frames que se pueden guardar como máximo.
+	*i_max_steps	Cantidad de cuadros intermedios
+	*i_curr_steps	Cantidad de cuadros actuales
+	*FRAME KeyFrame[MAX_FRAMES]	aqui se guardan los valores de los KeyFrames. Deben tomarse en cuenta todos los valores que estarán en rastreo y sus incrementos
+	*FrameIndex	¿En qué frame voy?
+	*play	Inicia o pausa la animación
+	*playIndex	Utiliza el frame actual para acceder a la estructura FRAME y hacer cálculos en la interpolación.
+	*w y h no fueron utilizados
+	*frame, time, timebase y s... no estoy segura.
+
+	Las funciones:
+	*saveFrame	guarda los valores de los KeyFrames en la estructura FRAME[index] e incrementa el index
+	*resetElements	para reiniciar la animación, pone en 0 current frame
+	*interpolation	calcula los valores de interpolación para la animación fluida del KeyFrame. Más fluido mientras más pasos se pongan en max_steps
+*/
+
 float pBz = 0.0, pCx = 0.0, pCz = 0.0, pDx = 0.0, pDz = 0.0, pFx = 0.0, pFy = 0.0, pFz = 0.0, pGz = 0.0;
 #define MAX_FRAMES 15		//15 keyframes
 int i_max_steps = 90;		//Cantidad de cuadros intermedios	valores peque�os: animacion r�pida, valores grandes: animaci�n m�s pausada
@@ -196,7 +431,8 @@ int playIndex = 0;
 int w = 500, h = 500;
 int frame = 0, time, timebase = 0;
 char s[30];
-//	************* END KEY FRAMES	************* //
+
+
 //	*********************	KEYFRAMES ***************			
 
 void saveFrame(void) {
@@ -240,30 +476,50 @@ void interpolation(void)
 }
 
 //	*************	KEY FRAMES	*********************
+
 void InitGL(GLvoid)     // Inicializamos parametros
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo	
 
 	glEnable(GL_TEXTURE_2D);
-
 	glShadeModel(GL_SMOOTH);
-	glLightfv(GL_LIGHT1, GL_POSITION, Position);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, Diffuse);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-
-
 	glClearDepth(1.0f);									// Configuramos Depth Buffer
 	glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
 	glDepthFunc(GL_LEQUAL);								// Tipo de Depth Testing a realizar
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
 	glEnable(GL_AUTO_NORMAL);
 	glEnable(GL_NORMALIZE);
-
 /* setup blending */
 	glEnable(GL_BLEND);			// Turn Blending On
 
+/*
+	**********	LUCES	**********
+	//gLightfv(light,pname,params)
+*/
+	//Puntual		Foco de lampara de exterior
+	glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);					// Setup The Ambient Light
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);					// Setup The Diffuse Light
+	glLightfv(GL_LIGHT1, GL_SPECULAR, LightSpecular);				// Setup The Diffuse Light
+	glLightfv(GL_LIGHT1, GL_LINEAR_ATTENUATION, aten1);
+
+	//Spotlight		Foco de lámpara
+	glLightfv(GL_LIGHT2, GL_AMBIENT, LightAmbient);					// Setup The Ambient Light
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, LightDiffuse);					// Setup The Diffuse Light
+	glLightfv(GL_LIGHT2, GL_SPECULAR, LightSpecular);				// Setup The Diffuse Light
+	glLightfv(GL_LIGHT2, GL_LINEAR_ATTENUATION, aten2);
+
+	//Puntual		Foco del Techo
+	glLightfv(GL_LIGHT3, GL_AMBIENT, LightAmbient);					// Setup The Ambient Light
+	glLightfv(GL_LIGHT3, GL_DIFFUSE, LightDiffuse);					// Setup The Diffuse Light
+	glLightfv(GL_LIGHT3, GL_SPECULAR, LightSpecular);				// Setup The Diffuse Light
+	glLightfv(GL_LIGHT3, GL_LINEAR_ATTENUATION, atenTecho);
+	
+/*
+	********** TEXTURAS **********
+
+	Carga de texturas.
+	Debe ser cuadrada o casi cuadrada porque si no ... crashea el programa.
+*/
 	cielo.LoadBMP("Resources/Texturas/cielo.bmp");
 	cielo.BuildGLTexture();
 	cielo.ReleaseImage();
@@ -308,30 +564,71 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	t_techo.BuildGLTexture();
 	t_techo.ReleaseImage();
 
-//Carga de Figuras
-	sofa._3dsLoad("Resources/Modelos/sofa2.3DS");
-	//sofa.VertexNormals();
-	tv._3dsLoad("Resources/Modelos/TVs.3DS");
-	librero._3dsLoad("Resources/Modelos/estante3.3DS");
-	chess._3dsLoad("Resources/Modelos/Chess/chessboard.3DS");
-	bPeon._3dsLoad("Resources/Modelos/Chess/pawnB.3DS");
-	nPeon._3dsLoad("Resources/Modelos/Chess/pawnN.3DS");
-	bTorre._3dsLoad("Resources/Modelos/Chess/towerB.3DS");
-	nTorre._3dsLoad("Resources/Modelos/Chess/towerN.3DS");
-	bAlfil._3dsLoad("Resources/Modelos/Chess/bishopB.3DS");
-	nAlfil._3dsLoad("Resources/Modelos/Chess/bishopN.3DS");
-	bCaballo._3dsLoad("Resources/Modelos/Chess/horseB.3DS");
-	nCaballo._3dsLoad("Resources/Modelos/Chess/horseN.3DS");
-	bRey._3dsLoad("Resources/Modelos/Chess/kingB.3DS");
-	nRey._3dsLoad("Resources/Modelos/Chess/kingN.3DS");
-	bReina._3dsLoad("Resources/Modelos/Chess/queenB.3DS");
-	nReina._3dsLoad("Resources/Modelos/Chess/queenN.3DS");
+	t_dado.LoadTGA("Resources/Texturas/Dado.tga");
+	t_dado.BuildGLTexture();
+	t_techo.ReleaseImage();
+	/*
+		********** FIGURAS **********
 
-	//Posición de cámara inicial
-//	mPosX 0.13	mPosY 3.2	mPosZ 8.95
-//	mViewX 0.13	mViewY 3.2	mViewZ 5.95
-//	mUpX 0.0	mUpY 1.0	mUpZ 0.0
-//	glookupdown 0.0
+		Carga de figuras 3DS.
+		Casi siempre debe ir escrito como .3DS ,en mayusculas.
+		Algunas veces crashea en la ejecución, asi que se abre en 3D MAX y se vuelve a exportar como 3DS, esperando que funcione
+	*/
+
+	foco._3dsLoad("Resources/Modelos/foco.3DS");
+	foco.VertexNormals();
+	lampara._3dsLoad("Resources/Modelos/lampara.3DS");
+	lampara.VertexNormals();
+	lamparaCalle._3dsLoad("Resources/Modelos/lamparaCalle.3DS");
+	lamparaCalle.VertexNormals();
+
+	sofa._3dsLoad("Resources/Modelos/sofa2.3DS");
+	sofa.VertexNormals();
+	tv._3dsLoad("Resources/Modelos/TVs.3DS");
+	tv.VertexNormals();
+	librero._3dsLoad("Resources/Modelos/estante.3DS");
+	librero.VertexNormals();
+	chess._3dsLoad("Resources/Modelos/Chess/chessboard.3DS");
+	chess.VertexNormals();
+	bPeon._3dsLoad("Resources/Modelos/Chess/pawnB.3DS");
+	bPeon.VertexNormals();
+	nPeon._3dsLoad("Resources/Modelos/Chess/pawnN.3DS");
+	nPeon.VertexNormals();
+	bTorre._3dsLoad("Resources/Modelos/Chess/towerB.3DS");
+	bTorre.VertexNormals();
+	nTorre._3dsLoad("Resources/Modelos/Chess/towerN.3DS");
+	nTorre.VertexNormals();
+	bAlfil._3dsLoad("Resources/Modelos/Chess/bishopB.3DS");
+	bAlfil.VertexNormals();
+	nAlfil._3dsLoad("Resources/Modelos/Chess/bishopN.3DS");
+	nAlfil.VertexNormals();
+	bCaballo._3dsLoad("Resources/Modelos/Chess/horseB.3DS");
+	bCaballo.VertexNormals();
+	nCaballo._3dsLoad("Resources/Modelos/Chess/horseN.3DS");
+	nCaballo.VertexNormals();
+	bRey._3dsLoad("Resources/Modelos/Chess/kingB.3DS");
+	bRey.VertexNormals();
+	nRey._3dsLoad("Resources/Modelos/Chess/kingN.3DS");
+	nRey.VertexNormals();
+	bReina._3dsLoad("Resources/Modelos/Chess/queenB.3DS");
+	bReina.VertexNormals();
+	nReina._3dsLoad("Resources/Modelos/Chess/queenN.3DS");
+	nReina.VertexNormals();
+
+/*
+		********** CAMARAS **********
+		
+		Inicialización de las posiciones de las cámaras: original (cuando carga), cuarto y juego.
+		Teniendo en cuenta los parámteros:
+
+	Posición de cámara inicial
+
+		mPosX 0.13	mPosY 3.2	mPosZ 8.95
+		mViewX 0.13	mViewY 3.2	mViewZ 5.95
+		mUpX 0.0	mUpY 1.0	mUpZ 0.0
+		glookupdown 0.0
+*/
+
 	objCamera.Position_Camera(4.36f, 15.8f, 30.82f, 4.15f, 15.8f, 27.82f, 0, 1, 0);
 
 	//Posiciones de cámaras para Juego y Cuarto iniciales
@@ -356,8 +653,15 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	up_yJ = 1.0;
 	up_zJ = 0.0;
 	lookUpDownJ = 73.0;
+/*
+		********** KEY FRAMES **********
 
-	//	**************	KEY FRAMES	**************
+		Inicialización de KeyFrames.
+
+		Primero pone todos los valores permitidos en FRAME como 0
+		Luego, añadimos manualmente frames previamente analizados.
+		
+*/
 	for (int i = 0; i < MAX_FRAMES; i++)
 	{
 		KeyFrame[i].pBz = 0;
@@ -635,16 +939,14 @@ void createCuarto() {
 	glPushMatrix();
 		glTranslatef(0.0, 9.15, -1.0);
 		glScalef(18.0, 18.0, 18.0);
-		glDisable(GL_LIGHTING);
-		cuarto.cuarto(t_pared1.GLindex, t_pared2.GLindex, t_pisoM.GLindex, t_techo.GLindex, 1.0);
-		glEnable(GL_LIGHTING);
+		set_material(perl);
+		cuarto.cuarto(t_pared1.GLindex, t_pared2.GLindex, t_pisoM.GLindex, t_techo.GLindex, -1.0);
 	glPopMatrix();
 	glPushMatrix();
 		glTranslatef(0.0, 9.195, -1.0);
 		glScalef(18.1, 18.1, 18.1);
-		glDisable(GL_LIGHTING);
-		cuarto.cuarto(t_wall.GLindex, t_wall.GLindex, t_wall.GLindex, t_wall.GLindex, -1.0);
-		glEnable(GL_LIGHTING);
+		set_material(polishedSilver);
+		cuarto.cuarto(t_wall.GLindex, t_wall.GLindex, t_wall.GLindex, t_wall.GLindex, 1.0);
 	glPopMatrix();
 }
 
@@ -653,9 +955,9 @@ void createPuerta() {
 		glTranslatef(3.6, 4.7, 8.05);
 		glRotatef(rotPuerta, 0.0, 1.0, 0.0);	//rotPuerta sirve para la animación de abrir y cerrar puerta con tecla 3
 		glScalef(18.1, 18.1, 1.0);
-		glDisable(GL_LIGHTING);
+		//glDisable(GL_LIGHTING);
 		puerta.puerta(t_door.GLindex);
-		glEnable(GL_LIGHTING);
+		//glEnable(GL_LIGHTING);
 	glPopMatrix();
 }
 
@@ -664,9 +966,9 @@ void createVentana() {
 		glTranslatef(0.0, 14.5, -10.0);
 		glRotatef(rotVentana, 1.0, 0.0, 0.0);	//rotVentana sirve para la animación de abrir y cerrar puerta con tecla 4
 		glScalef(18.0+scaleX, 18.0+scaleY, 1.0);
-		glDisable(GL_LIGHTING);
+		//glDisable(GL_LIGHTING);
 		puerta.ventana(t_ventana.GLindex, 0.0, 0.0);
-		glEnable(GL_LIGHTING);
+		//glEnable(GL_LIGHTING);
 	glPopMatrix();
 }
 
@@ -1021,12 +1323,128 @@ void createChess() {
 	glPopMatrix();
 }
 
+void createFoco1() {
+	glPushMatrix();
+		float s = 0.001;
+		//glTranslatef(-1.2 + trax, 15.9 + tray, 0.0 + traz);
+		glTranslatef(-1.2, 15.9, 0.0);
+		glScalef(s, s, s);
+		foco.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+}
+
+void createFoco2() {
+	glPushMatrix();
+	//float s = 0.01;
+	glTranslatef(-5.7, 6.4, 0.6);
+	//glTranslatef(0.0 + trax, 0.0 + tray, -1.0 + traz);
+	//glScalef(sc, sc, sc);
+	//glRotatef(sc, 0.0, 1.0, 0.0);
+	glRotatef(-44.0, 0.0, 1.0, 0.0);
+	glScalef(0.02, 0.02, 0.02);
+	lampara.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+}
+
+void createFoco3() {
+	glPushMatrix();
+	float s = 0.04;
+	glTranslatef(-0.3, 0.0, 17.2);
+	//glTranslatef(0.0 + trax, 0.0 + tray, -1.0 + traz);
+	glScalef(s, s, s);
+	lamparaCalle.GLrender(NULL, _SHADED, 1.0);
+	glPopMatrix();
+}
+
+void foc1() {
+	if (foco1)
+		glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 180.0);			// Position The Light
+	//	IMPORTANTE		180.0 es el valor en el que se convierte en una luz puntual
+	glPushMatrix();
+		glTranslatef(-0.4, 13.6, 17.2);		//En el techo mismo
+		//glTranslatef(-0.4 + trax, 13.6 + tray, 17.2 + traz);
+		glutSolidSphere(0.1, 10, 10);	//Representa el foco, solo para prueba
+
+		if (foco1) {
+			glEnable(GL_LIGHT1);
+			glLightfv(GL_LIGHT1, GL_POSITION, LightPosition3);
+		}
+		else {
+			glDisable(GL_LIGHT1);
+		}
+	glPopMatrix();
+}
+
+void foc2() {
+	//	LUZ SPOTLIGHT
+	if (foco2)
+		glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, LightAngle);			// Position The Light
+	glPushMatrix();
+		//glTranslatef(0.0 + trax, 0.0 + tray, 0.0 + traz);
+		glTranslatef(-5.0, 9.1, -0.1);
+		glutSolidSphere(0.1, 10, 10);
+		//glRotatef(angleX2, 1.0f, 0.0f, 0.0f);
+		//glRotatef(angleY2, 0.0f, 1.0f, 0.0f);
+		glRotatef(-66.0, 1.0f, 0.0f, 0.0f);
+		glRotatef(-16.0, 0.0f, 1.0f, 0.0f);
+
+
+		if (foco2) {
+			glEnable(GL_LIGHT2);
+			glLightfv(GL_LIGHT2, GL_POSITION, LightPosition2);
+			glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, LightDirection2);
+
+		}
+		else {
+			glDisable(GL_LIGHT2);
+		}
+	glPopMatrix();
+}
+
+void foc3() {
+	if (foco3)
+		glLightf(GL_LIGHT3, GL_SPOT_CUTOFF, 180.0);			// Position The Light
+	//	IMPORTANTE		180.0 es el valor en el que se convierte en una luz puntual
+	glPushMatrix();
+		glTranslatef(-1.0, 17.4, 0.0);		//En el techo mismo
+		//glTranslatef(-1.0 + trax, 17.4 + tray, 0.0 + traz);
+		glutSolidSphere(0.1, 10, 10);	//Representa el foco, solo para prueba
+		
+		if (foco3) {
+			glEnable(GL_LIGHT3);
+			glLightfv(GL_LIGHT3, GL_POSITION, LightPosition3);
+		}
+		else {
+			glDisable(GL_LIGHT3);
+		}
+	glPopMatrix();
+}
+
+void luz() {
+	
+	glPushMatrix();
+		glPushMatrix();
+			if (!light) {
+				glDisable(GL_LIGHTING);
+				glDisable(GL_LIGHT1);
+				glDisable(GL_LIGHT2);
+				glDisable(GL_LIGHT3);
+			}
+			else {
+				glEnable(GL_LIGHTING);
+			}
+		glPopMatrix();
+		foc1();
+		foc2();
+		foc3();
+	glPopMatrix();
+}
+
 void display(void)   // Creamos la funcion donde se dibuja
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
-
 	glPushMatrix();	//General
 
 		glRotatef(g_lookupdown, 1.0f, 0, 0);
@@ -1034,47 +1452,70 @@ void display(void)   // Creamos la funcion donde se dibuja
 			objCamera.mView.x, objCamera.mView.y, objCamera.mView.z,
 			objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
 
+		luz();
 		glPushMatrix(); //Piso primario
 			glTranslatef(0.0, 0.0, 0.0);
-			glScalef(20, 0.2, 20);
-			glDisable(GL_LIGHTING);
+			glScalef(20, 0.2, 40);
+			set_material(chrome);
 			pisoGeneral.piso(t_piso.GLindex);
-			glEnable(GL_LIGHTING);
 		glPopMatrix();
 
 		glPushMatrix();
 			glPushMatrix(); //Creamos cielo
-				glDisable(GL_LIGHTING);
 				glTranslatef(0, 60, 0);
 				fig1.skybox(130.0, 130.0, 130.0, cielo.GLindex);
-				glEnable(GL_LIGHTING);
 			glPopMatrix();
 		glPopMatrix();
-		//Pivot 0,0,0
 		
+		//Pivot 0,0,0
+		set_material(perl);
 		createCuarto();
+		set_material(bronze);
 		createPuerta();
+		set_material(perl);
 		createVentana();
-		createMuebles();
-		createChess();
-		//Sin esto, se queda el color del material del estante? why???
-		glDisable(GL_LIGHTING);
-		glDisable(GL_COLOR_MATERIAL);
+		if (light == false) {
+			glEnable(GL_LIGHTING);
+			glEnable(GL_LIGHT0);
+			createMuebles();
+			createChess();
+			createFoco1();
+			createFoco2();
+			createFoco3();
+			glDisable(GL_LIGHTING);
+			glDisable(GL_LIGHT0);
+		}
+		else {
+			createMuebles();
+			createChess();
+			createFoco1();
+			createFoco2();
+			createFoco3();
+		}
+		set_material(gold);
 		createMesa();
+		set_material(polishedCopper);
 		createSillas();
 
+		glPushMatrix();
+			set_material(perl);
+			glTranslatef(3.0, 9.2, -0.4);
+			//glTranslatef(0.0 + trax, 0.0 + tray, 0.0 + traz);
+			glRotatef(rotDado, ranX, ranY, ranZ);
+			mesa.prisma(0.5, 0.5, 0.5, t_dado.GLindex);
+		glPopMatrix();
 		
 	glPopMatrix();	//General
 
 	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_LIGHTING);
+	//glDisable(GL_LIGHTING);
 
 	// Pintar texto en pantalla
 	glColor3f(1.0, 0.0, 0.0);
 	pintaTexto(-12, 12.0, -14.0, (void*)font, "Proyecto Final");
 	pintaTexto(-12, 10.5, -14, (void*)font, "Cuarto de Juegos");
 	glColor3f(1.0, 1.0, 1.0);
-	glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 
 	glutSwapBuffers();
@@ -1168,14 +1609,13 @@ void animacion()
 				}
 			}
 		}
-		dwLastUpdateTime = dwCurrentTime;
-	}
-	if (dwElapsedTime >= 30)
-	{
-		
-		dwLastUpdateTime = dwCurrentTime;
-	}
 
+		ranX = (float)(rand() % 100)/100.0;
+		ranY = (float)(rand() % 100)/100.0;
+		ranZ = (float)(rand() % 100)/100.0;
+		rotDado = (float)(rand() % 180 + 45);
+		dwLastUpdateTime = dwCurrentTime;
+	}
 	if (play)
 	{
 
@@ -1214,6 +1654,7 @@ void animacion()
 
 	}
 
+	
 	glutPostRedisplay();
 }
 
@@ -1232,7 +1673,7 @@ void reshape(int width, int height)   // Creamos funcion Reshape
 	// Tipo de Vista
 
 	//glFrustum(-0.1, 0.1, -0.1, 0.1, 0.1, 170.0);
-	glFrustum(-0.1, 0.1, -0.1, 0.1, 0.1, 1000.0);
+	glFrustum(-0.1, 0.1, -0.1, 0.1, 0.1, 200.0);
 
 	glMatrixMode(GL_MODELVIEW);							// Seleccionamos Modelview Matrix
 	glLoadIdentity();
@@ -1419,63 +1860,6 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 					banderaTrans = false;
 			}
 			break;
-		/*case '6':
-			rotSilla += 2.0;
-			printf("rot = %f\n", rotSilla);
-			break;
-		case '7':
-			rotSilla -= 2.0;
-			printf("rot = %f\n", rotSilla);
-			break;*/
-		/*case 'j':
-			trax += 0.1;
-			printf("x = %f\ty = %f\tz = %f\n", trax,tray,traz);
-			break;
-		case 'i':
-			tray += 0.1;
-			printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
-			break;
-		case 'k':
-			traz += 0.1;
-			printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
-			break;
-		case 'J':
-			trax -= 0.1;
-			printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
-			break;
-		case 'I':
-			tray -= 0.1;
-			printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
-			break;
-		case 'K':
-			traz -= 0.1;
-			printf("x = %f\ty = %f\tz = %f\n", trax, tray, traz);
-			break;
-		case 'b':
-			scaleX += 0.01;
-			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-			break;
-		case 'B':
-			scaleX -= 0.01;
-			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-			break;
-		case 'n':
-			scaleY += 0.01;
-			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-			break;
-		case 'N':
-			scaleY -= 0.01;
-			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-			break;
-		case 'm':
-			scaleZ += 0.01;
-			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-			break;
-		case 'M':
-			scaleZ -= 0.01;
-			printf("Sx = %f\tSy = %f\tSz = %f\n", scaleX, scaleY, scaleZ);
-			break;*/
-
 		/*case ' ':	//Salvar Frame
 			if (FrameIndex < MAX_FRAMES)
 			{
@@ -1513,49 +1897,46 @@ void keyboard(unsigned char key, int x, int y)  // Create Keyboard Function
 				printf("******************************************\n\n");
 			}
 			break;*/
-//Casos utilizados para mover las fichas de Ajedrez
-		/*case 'g':
-			pBz -= 0.5;
-			break;
-		case 'h':
-			pGz += 0.5;
-			break;
-		case 'j':
-			pCx += 0.5;
-			break;
-		case 'J':
-			pCx -= 0.5;
-			break;
-		case 'k':
-			pCz += 0.5;
-			break;
-		case 'K':
-			pCz -= 0.5;
-			break;
-		case 'i':
-			pDx += 0.5;
-			break;
-		case 'I':
-			pDz += 0.5;
-			break;
-		case 'l':
-			pFx += 0.5;
-			break;
+		
+		case 'l':   //Activamos/desactivamos luz
 		case 'L':
-			pFx -= 0.5;
+			light = !light;
+			if (light == true) {
+				foco1 = true;
+				foco2 = true;
+				foco3 = true;
+			}
+			else {
+				foco1 = false;
+				foco2 = false;
+				foco3 = false;
+			}
 			break;
-		case 'p':
-			pFz += 0.5;
+		case '7':   //Activamos/desactivamos luz
+		//case 'P':
+			//positional = !positional;
+			if(light == true)
+				foco1 = !foco1;
 			break;
-		case 'P':
-			pFz -= 0.5;
+		case '8':
+			if (light == true)
+			foco2 = !foco2;
 			break;
-		case 'o':
-			pFy += 0.5;
+		case '9':
+			if (light == true)
+			foco3 = !foco3;
 			break;
-		case 'O':
-			pFy -= 0.5;
-			break;*/
+		
+		case 'c':
+			LightAngle += 2.0;
+			printf("Ang = %f\n", LightAngle);
+			break;
+		case 'v':
+			LightAngle -= 2.0;
+			printf("Ang = %f\n", LightAngle);
+			break;
+
+		
 		case 27:        // Cuando Esc es presionado...
 			exit(0);   // Salimos del programa
 			break;
